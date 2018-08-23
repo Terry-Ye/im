@@ -1,0 +1,4 @@
+[base]
+pidfile = "/tmp/comet.pid"
+
+
