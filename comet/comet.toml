@@ -1,4 +1,6 @@
 [base]
 pidfile = "/tmp/comet.pid"
+logfile = "/Users/AT/go/src/im/logs/comet/comet.log"
+
 
 

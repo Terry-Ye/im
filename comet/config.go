@@ -12,7 +12,10 @@ type Config struct {
 }
 
 type BaseConf struct {
-	pidfile string `mapstructure:"pidfile"`
+	Pidfile string `mapstructure:"pidfile"`
+	// MaxProc   int
+	// PprofBind []string `mapstructure:"pprofBind"`
+	Logfile string `mapstructure:"logfile"`
 }
 
 var (
@@ -44,7 +47,10 @@ func InitConfig() (err error) {
 func NewConfig() *Config {
 	return &Config{
 		Base: BaseConf{
-			pidfile: "/tmp/comet.pid",
+			Pidfile: "/tmp/comet.pid",
+			Logfile: "/Users/AT/go/src/im/logs/comet/comet.log",
+			// MaxProc:   runtime.NumCPU(),
+			// PprofBind: []string{"localhost:7911"},
 		},
 	}
 }
