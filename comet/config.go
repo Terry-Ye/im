@@ -3,19 +3,25 @@ package main
 import (
 	"flag"
 	"fmt"
+	"runtime"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Base BaseConf `mapstructure:"base"`
+	Base      BaseConf      `mapstructure:"base"`
+	Websocket WebsocketConf `mapstructure:"websocket"`
 }
 
 type BaseConf struct {
-	Pidfile string `mapstructure:"pidfile"`
-	// MaxProc   int
-	// PprofBind []string `mapstructure:"pprofBind"`
-	Logfile string `mapstructure:"logfile"`
+	Pidfile   string `mapstructure:"pidfile"`
+	MaxProc   int
+	PprofBind []string `mapstructure:"pprofBind"` // 性能监控的域名端口
+	Logfile   string   `mapstructure:"logfile"`   // log 文件
+}
+
+type WebsocketConf struct {
+	Bind []string `mapstructure:"Bind"` // 性能监控的域名端口
 }
 
 var (
@@ -47,10 +53,10 @@ func InitConfig() (err error) {
 func NewConfig() *Config {
 	return &Config{
 		Base: BaseConf{
-			Pidfile: "/tmp/comet.pid",
-			Logfile: "/Users/AT/go/src/im/logs/comet/comet.log",
-			// MaxProc:   runtime.NumCPU(),
-			// PprofBind: []string{"localhost:7911"},
+			Pidfile:   "/tmp/comet.pid",
+			Logfile:   "/Users/AT/go/src/im/logs/comet/comet.log",
+			MaxProc:   runtime.NumCPU(),
+			PprofBind: []string{"localhost:7911"},
 		},
 	}
 }

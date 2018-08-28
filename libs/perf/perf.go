@@ -17,9 +17,10 @@ func Init(pprofBind []string) {
 	for _, addr := range pprofBind {
 		go func() {
 			if err := http.ListenAndServe(addr, pprofServeMux); err != nil {
-				log.Panic("I'm bailing.") //log之后会panic()
-				log.Error("http.ListenAndServe(\"%s\", pprofServeMux) error(%v)", addr, err)
-				panic(err)
+				log.WithFields(log.Fields{
+					"addr":  addr,
+					"error": err,
+				}).Info("http.ListenAndServe err")
 			}
 		}()
 	}
