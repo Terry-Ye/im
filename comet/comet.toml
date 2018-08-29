@@ -5,4 +5,10 @@ logfile = "/Users/AT/go/src/im/logs/comet/comet.log"
 [websocket]
 bind = "0.0.0.0:7911"
 
+[bucket]
+
+num = "256"
+channel = "1024"
+room = "1024"
+
 

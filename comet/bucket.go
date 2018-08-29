@@ -1,12 +1,6 @@
 package main
 
-import (
-	"sync"
-)
-
-func InitWebsocket() {
-	websocket.BinaryMessage()
-}
+import "sync"
 
 type BucketOptions struct {
 	ChannelSize int
@@ -19,7 +13,16 @@ type Bucket struct {
 	cLock    sync.RWMutex        // protect the channels for chs
 	chs      map[string]*Channel // map sub key to a channel
 	boptions BucketOptions
-	rooms    map[int32]*Room // bucket room channels
+	// room
+	rooms map[int32]*Room // bucket room channels
 	// routines    []chan *proto.BoardcastRoomArg
 	// routinesNum uint64
+}
+
+func NewBucket(boptions *BucketOptions) (b *Bucket) {
+	b = new(Bucket)
+	b.chs = make(map[string]*Channel, boptions.ChannelSize)
+	b.boptions = boptions
+	b.rooms = make(map[int]*Room, boptions.RoomSize)
+	return
 }

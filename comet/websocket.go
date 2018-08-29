@@ -1,7 +1,11 @@
 package main
 
-import "github.com/gorilla/websocket"
+import (
+	"net/http"
+)
 
 func InitWebsocket() {
-	websocket.BinaryMessage()
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		serveWs(hub, w, r)
+	})
 }

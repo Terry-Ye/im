@@ -11,8 +11,10 @@ import (
 type Config struct {
 	Base      BaseConf      `mapstructure:"base"`
 	Websocket WebsocketConf `mapstructure:"websocket"`
+	Bucket    BucketConf    `mapstructure:"bucket"`
 }
 
+// 基础的配置信息
 type BaseConf struct {
 	Pidfile   string `mapstructure:"pidfile"`
 	MaxProc   int
@@ -20,8 +22,14 @@ type BaseConf struct {
 	Logfile   string   `mapstructure:"logfile"`   // log 文件
 }
 
+type BucketConf struct {
+	Num     int `mapstructure:"num"`
+	Channel int `mapstructure:"channel"`
+	Room    int `mapstructure:"room"`
+}
+
 type WebsocketConf struct {
-	Bind []string `mapstructure:"Bind"` // 性能监控的域名端口
+	Bind []string `mapstructure:"bind"` // 性能监控的域名端口
 }
 
 var (
@@ -57,6 +65,11 @@ func NewConfig() *Config {
 			Logfile:   "/Users/AT/go/src/im/logs/comet/comet.log",
 			MaxProc:   runtime.NumCPU(),
 			PprofBind: []string{"localhost:7911"},
+		},
+		Bucket: BucketConf{
+			Num:     256,
+			Channel: 1024,
+			Room:    1024,
 		},
 	}
 }
