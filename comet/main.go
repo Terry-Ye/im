@@ -23,13 +23,24 @@ func main() {
 	// 加入性能监控
 	perf.Init(Conf.Base.PprofBind)
 	// new server
-	buckets := make([]*Bucket, Conf.Bucket.Num)
+	Buckets := make([]*Bucket, Conf.Bucket.Num)
+
 	for i := 0; i < Conf.Bucket.Num; i++ {
-		buckets[i] = NewBucket(BucketOptions{
+		Buckets[i] = NewBucket(BucketOptions{
 			ChannelSize: Conf.Bucket.Channel,
 			RoomSize:    Conf.Bucket.Room,
 		})
 	}
+	DefaultServer := NewServer(Buckets, ServerOptions{
+		WriteWait:       Conf.Base.WriteWait,
+		PongWait:        Conf.Base.PongWait,
+		PingPeriod:      Conf.Base.PingPeriod,
+		MaxMessageSize:  Conf.Base.MaxMessageSize,
+		ReadBufferSize:  Conf.Base.ReadBufferSize,
+		WriteBufferSize: Conf.Base.WriteBufferSize,
+	})
+
+	// log.Panicf("buckets :%v", buckets)
 
 	if err := InitWebsocket(Conf.Websocket.Bind); err != nil {
 		log.Fatal(err)

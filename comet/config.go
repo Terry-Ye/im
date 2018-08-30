@@ -16,20 +16,27 @@ type Config struct {
 
 // 基础的配置信息
 type BaseConf struct {
-	Pidfile   string `mapstructure:"pidfile"`
-	MaxProc   int
-	PprofBind []string `mapstructure:"pprofBind"` // 性能监控的域名端口
-	Logfile   string   `mapstructure:"logfile"`   // log 文件
+	Pidfile         string `mapstructure:"pidfile"`
+	MaxProc         int
+	PprofBind       []string `mapstructure:"pprofBind"` // 性能监控的域名端口
+	Logfile         string   `mapstructure:"logfile"`   // log 文件
+	WriteWait       int
+	PongWait        int
+	PingPeriod      int
+	MaxMessageSize  int
+	ReadBufferSize  int
+	WriteBufferSize int
 }
 
 type BucketConf struct {
-	Num     int `mapstructure:"num"`
-	Channel int `mapstructure:"channel"`
-	Room    int `mapstructure:"room"`
+	Num      int `mapstructure:"num"`
+	Channel  int `mapstructure:"channel"`
+	Room     int `mapstructure:"room"`
+	SvrProto int `mapstructure:"svrProto"`
 }
 
 type WebsocketConf struct {
-	Bind []string `mapstructure:"bind"` // 性能监控的域名端口
+	Bind string `mapstructure:"bind"` // 性能监控的域名端口
 }
 
 var (
@@ -61,15 +68,25 @@ func InitConfig() (err error) {
 func NewConfig() *Config {
 	return &Config{
 		Base: BaseConf{
-			Pidfile:   "/tmp/comet.pid",
-			Logfile:   "/Users/AT/go/src/im/logs/comet/comet.log",
-			MaxProc:   runtime.NumCPU(),
-			PprofBind: []string{"localhost:7911"},
+			Pidfile:         "/tmp/comet.pid",
+			Logfile:         "/Users/AT/go/src/im/logs/comet/comet.log",
+			MaxProc:         runtime.NumCPU(),
+			PprofBind:       []string{"localhost:7911"},
+			WriteWait:       10,
+			PongWait:        60,
+			PingPeriod:      54,
+			MaxMessageSize:  512,
+			ReadBufferSize:  1024,
+			WriteBufferSize: 1024,
 		},
 		Bucket: BucketConf{
-			Num:     256,
-			Channel: 1024,
-			Room:    1024,
+			Num:      256,
+			Channel:  1024,
+			Room:     1024,
+			SvrProto: 80,
+		},
+		Websocket: WebsocketConf{
+			Bind: "0.0.0.0:7911",
 		},
 	}
 }

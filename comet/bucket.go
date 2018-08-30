@@ -19,10 +19,11 @@ type Bucket struct {
 	// routinesNum uint64
 }
 
-func NewBucket(boptions *BucketOptions) (b *Bucket) {
+func NewBucket(boptions BucketOptions) (b *Bucket) {
 	b = new(Bucket)
 	b.chs = make(map[string]*Channel, boptions.ChannelSize)
 	b.boptions = boptions
-	b.rooms = make(map[int]*Room, boptions.RoomSize)
+
+	b.rooms = make(map[int32]*Room, boptions.RoomSize)
 	return
 }

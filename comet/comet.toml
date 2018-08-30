@@ -10,5 +10,6 @@ bind = "0.0.0.0:7911"
 num = "256"
 channel = "1024"
 room = "1024"
+svrProto = "80"
 
 
