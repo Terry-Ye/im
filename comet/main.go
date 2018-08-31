@@ -9,6 +9,11 @@ import (
 	"runtime"
 )
 
+var (
+	DefaultServer *Server
+	// Debug bool
+)
+
 func main() {
 	flag.Parse()
 

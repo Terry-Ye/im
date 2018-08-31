@@ -1,10 +1,14 @@
 package main
 
-import "goim/libs/proto"
+import (
+	"im/libs/proto"
+	"github.com/gorilla/websocket"
+)
 
 type Channel struct {
 	Room   *Room
 	signal chan *proto.Proto
+	conn *websocket.Conn
 }
 
 func NewChannel(svr int) *Channel {
