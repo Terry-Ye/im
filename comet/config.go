@@ -6,6 +6,7 @@ import (
 	"runtime"
 
 	"github.com/spf13/viper"
+	"time"
 )
 
 type Config struct {
@@ -20,9 +21,9 @@ type BaseConf struct {
 	MaxProc         int
 	PprofBind       []string `mapstructure:"pprofBind"` // 性能监控的域名端口
 	Logfile         string   `mapstructure:"logfile"`   // log 文件
-	WriteWait       int
-	PongWait        int
-	PingPeriod      int
+	WriteWait       time.Duration
+	PongWait        time.Duration
+	PingPeriod      time.Duration
 	MaxMessageSize  int
 	ReadBufferSize  int
 	WriteBufferSize int
@@ -72,9 +73,9 @@ func NewConfig() *Config {
 			Logfile:         "/Users/AT/go/src/im/logs/comet/comet.log",
 			MaxProc:         runtime.NumCPU(),
 			PprofBind:       []string{"localhost:7911"},
-			WriteWait:       10,
-			PongWait:        60,
-			PingPeriod:      54,
+			WriteWait:       10 * time.Second,
+			PongWait:        60 * time.Second,
+			PingPeriod:      54 * time.Second,
 			MaxMessageSize:  512,
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
