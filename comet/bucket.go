@@ -29,3 +29,12 @@ func NewBucket(boptions BucketOptions) (b *Bucket) {
 	b.rooms = make(map[int32]*Room, boptions.RoomSize)
 	return
 }
+
+
+func (b *Bucket) Put(key string, ch *Channel) (err error){
+	b.cLock.Lock()
+	b.chs[key] = ch
+	b.cLock.Unlock()
+	return
+}
+

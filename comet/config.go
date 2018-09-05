@@ -24,7 +24,7 @@ type BaseConf struct {
 	WriteWait       time.Duration
 	PongWait        time.Duration
 	PingPeriod      time.Duration
-	MaxMessageSize  int
+	MaxMessageSize  int64
 	ReadBufferSize  int
 	WriteBufferSize int
 }
@@ -87,7 +87,7 @@ func NewConfig() *Config {
 			SvrProto: 80,
 		},
 		Websocket: WebsocketConf{
-			Bind: "0.0.0.0:7911",
+			Bind: ":7911",
 		},
 	}
 }

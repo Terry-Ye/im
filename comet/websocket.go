@@ -6,32 +6,52 @@ import (
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 	"time"
-	"encoding/json"
 	"im/libs/proto"
 	"im/libs/define"
 )
 
 
-
+func serveHome(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL)
+	if r.URL.Path != "/" {
+		http.Error(w, "Not found", http.StatusNotFound)
+		return
+	}
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	http.ServeFile(w, r, "home.html")
+}
 
 func InitWebsocket(bind string) (err error) {
-
+	log.Infof("size: %d",DefaultServer.Options.ReadBufferSize)
+	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+
 		serveWs(DefaultServer, w, r)
 	})
 
 
 	err = http.ListenAndServe(bind, nil)
+
 	return err
 
 }
 
 // serveWs handles websocket requests from the peer.
 func serveWs(server *Server, w http.ResponseWriter, r *http.Request) {
-	upgrader := websocket.Upgrader{
+	// upgrader := websocket.Upgrader{
+	// 	ReadBufferSize:  DefaultServer.Options.ReadBufferSize,
+	// 	WriteBufferSize: DefaultServer.Options.WriteBufferSize,
+	// }
+
+
+	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  DefaultServer.Options.ReadBufferSize,
 		WriteBufferSize: DefaultServer.Options.WriteBufferSize,
 	}
+
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 
@@ -66,12 +86,18 @@ func (s *Server) readPump(conn *websocket.Conn) {
 				log.Errorf("readPump ReadMessage err:%v", err)
 			}
 		}
+
 		log.Infof("message :%v", message)
 
 		var p = &proto.Proto{Ver: 0, Operation: define.OP_SEND, Body: message}
-		log.Debugf("message: %s", message)
+		// log.Infof("message :%v", p)
+		ch := new(Channel)
+		ch.conn = conn
+		ch.signal <- p
 
-		s.Buckets[0].chs["0"].signal <- p
+		// ch.broadcast <- message
+		b := s.Bucket("1_1")
+		b.Put("1_1", ch)
 
 	}
 }
@@ -85,13 +111,13 @@ func (s *Server) writePump(conn *websocket.Conn) {
 	}()
 	for {
 		select {
-		case message, ok := s.Buckets[0].chs["0"].signal:
+		case message := <-s.Buckets[0].chs["0"].signal:
 			conn.SetWriteDeadline(time.Now().Add(s.Options.WriteWait))
-			if !ok {
-				// The hub closed the channel.
-				conn.WriteMessage(websocket.CloseMessage, []byte{})
-				return
-			}
+			// if !ok {
+			// 	// The hub closed the channel.
+			// 	conn.WriteMessage(websocket.CloseMessage, []byte{})
+			// 	return
+			// }
 			log.Printf("TextMessage :%v", websocket.TextMessage)
 			w, err := conn.NextWriter(websocket.TextMessage)
 			if err != nil {
@@ -109,7 +135,7 @@ func (s *Server) writePump(conn *websocket.Conn) {
 		case <-ticker.C:
 			conn.SetWriteDeadline(time.Now().Add(s.Options.WriteWait))
 			log.Printf("websocket.PingMessage :%v", websocket.PingMessage)
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
 		}
