@@ -3,6 +3,7 @@ package main
 import (
 	"time"
 	"im/libs/hash/cityhash"
+	log "github.com/sirupsen/logrus"
 )
 
 type ServerOptions struct {
@@ -33,7 +34,7 @@ func NewServer(b []*Bucket, options ServerOptions) *Server {
 func (server *Server) Bucket(subKey string) *Bucket {
 	idx := cityhash.CityHash32([]byte(subKey), uint32(len(subKey))) % server.bucketIdx
 	// if Debug {
-	// 	log.Debug("\"%s\" hit channel bucket index: %d use cityhash", subKey, idx)
+		log.Printf("\"%s\" hit channel bucket index: %d use cityhash", subKey, idx)
 	// }
 	return server.Buckets[idx]
 }

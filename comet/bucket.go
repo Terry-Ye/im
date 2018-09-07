@@ -2,6 +2,7 @@ package main
 
 import (
 	"sync"
+	"im/libs/define"
 )
 
 type BucketOptions struct {
@@ -18,6 +19,7 @@ type Bucket struct {
 	rooms map[int32]*Room // bucket room channels
 	// routines    []chan *proto.BoardcastRoomArg
 	routinesNum uint64
+	broadcast chan []byte
 }
 
 func NewBucket(boptions BucketOptions) (b *Bucket) {
@@ -27,14 +29,33 @@ func NewBucket(boptions BucketOptions) (b *Bucket) {
 	b.boptions = boptions
 
 	b.rooms = make(map[int32]*Room, boptions.RoomSize)
+	// tmp
+	b.broadcast = make(chan []byte, 256)
 	return
 }
 
 
-func (b *Bucket) Put(key string, ch *Channel) (err error){
+func (b *Bucket) Put(key string, rid int32, ch *Channel) (err error){
+	var (
+		room *Room
+		ok   bool
+	)
 	b.cLock.Lock()
+
+	if rid != define.NO_ROOM {
+		if  room, ok = b.rooms[rid]; !ok {
+			room = NewRoom(rid)
+			b.rooms[rid] = room
+		}
+		ch.Room = room
+	}
+
 	b.chs[key] = ch
 	b.cLock.Unlock()
+
+	if room != nil {
+		err = room.Put(ch)
+	}
 	return
 }
 

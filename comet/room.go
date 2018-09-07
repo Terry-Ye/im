@@ -7,17 +7,35 @@ import (
 type Room struct {
 	Id     int32 // 房间号
 	rlock  sync.RWMutex
-	chs    []*Channel
+	next   *Channel // 该房间的所有客户端的Channel
 	drop   bool // 标示房间是否存活
-	Online int  // dirty read is ok  // 房间的channel数量，即房间的在线用户的多少
+	Online int  // 在线用户数量
 }
 
 func NewRoom(Id int32) (r *Room) {
 	r = new(Room)
 	r.Id = Id
 	r.drop = false
-	r.chs = nil
+	r.next = nil
 	r.Online = 0
 	return
+
+}
+
+func (r *Room) Put(ch *Channel) (err error) {
+	if !r.drop {
+		if r.next != nil {
+			r.next.Prev = ch
+
+		}
+		ch.Next = r.next
+		ch.Prev = nil
+		r.next = ch
+		r.Online++
+	}else {
+		err = ErrRoomDroped
+	}
+	return
+
 
 }

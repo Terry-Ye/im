@@ -7,10 +7,13 @@ import (
 	log "github.com/sirupsen/logrus"
 	"time"
 	"im/libs/proto"
-	"im/libs/define"
+	"encoding/json"
 )
 
-
+var (
+	newline = []byte{'\n'}
+	space   = []byte{' '}
+)
 func serveHome(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL)
 	if r.URL.Path != "/" {
@@ -26,6 +29,9 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 
 func InitWebsocket(bind string) (err error) {
 	log.Infof("size: %d",DefaultServer.Options.ReadBufferSize)
+
+
+
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 
@@ -86,52 +92,64 @@ func (s *Server) readPump(conn *websocket.Conn) {
 				log.Errorf("readPump ReadMessage err:%v", err)
 			}
 		}
+		var connArg  proto.ConnArg
+		log.Infof("message :%s", message)
+		if err := json.Unmarshal([]byte(message), &connArg); err != nil  {
+			log.Errorf("message struct %b", connArg)
+		}
 
-		log.Infof("message :%v", message)
-
-		var p = &proto.Proto{Ver: 0, Operation: define.OP_SEND, Body: message}
-		// log.Infof("message :%v", p)
+		b := s.Bucket(connArg.Key)
+		b.broadcast <- message
 		ch := new(Channel)
 		ch.conn = conn
-		ch.signal <- p
+		err = b.Put(connArg.Key, connArg.RoomId, ch)
+		if err != nil {
+			conn.Close()
+		}
 
-		// ch.broadcast <- message
-		b := s.Bucket("1_1")
-		b.Put("1_1", ch)
 
 	}
 }
 
 func (s *Server) writePump(conn *websocket.Conn) {
+	var key = "e4bac70ea5d10dfb"
+	b := s.Bucket(key)
+
 	ticker := time.NewTicker(s.Options.PingPeriod)
 	log.Printf("ticker :%v", ticker)
+
+
 	defer func() {
 		ticker.Stop()
 		conn.Close()
 	}()
 	for {
 		select {
-		case message := <-s.Buckets[0].chs["0"].signal:
+		case message, ok := <-b.broadcast:
 			conn.SetWriteDeadline(time.Now().Add(s.Options.WriteWait))
-			// if !ok {
-			// 	// The hub closed the channel.
-			// 	conn.WriteMessage(websocket.CloseMessage, []byte{})
-			// 	return
-			// }
+			if !ok {
+				// The hub closed the channel.
+				conn.WriteMessage(websocket.CloseMessage, []byte{})
+				return
+			}
 			log.Printf("TextMessage :%v", websocket.TextMessage)
 			w, err := conn.NextWriter(websocket.TextMessage)
 			if err != nil {
 				return
 			}
 			log.Printf("message :%v", message)
-			// w.Write(message)
-
-
-
+			w.Write(message)
+			// Add queued chat messages to the current websocket message.
+			n := len(b.broadcast)
+			for i := 0; i < n; i++ {
+				w.Write(newline)
+				w.Write(<-b.broadcast)
+			}
 
 			if err := w.Close(); err != nil {
 				return
 			}
+
 		case <-ticker.C:
 			conn.SetWriteDeadline(time.Now().Add(s.Options.WriteWait))
 			log.Printf("websocket.PingMessage :%v", websocket.PingMessage)
@@ -142,13 +160,5 @@ func (s *Server) writePump(conn *websocket.Conn) {
 	}
 }
 
-
-// func (server *Server) run() {
-// 	for{
-// 		select {
-// 		// case server.Buckets
-// 		}
-// 	}
-// }
 
 
