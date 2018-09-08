@@ -43,6 +43,7 @@ func main() {
 		MaxMessageSize:  Conf.Base.MaxMessageSize,
 		ReadBufferSize:  Conf.Base.ReadBufferSize,
 		WriteBufferSize: Conf.Base.WriteBufferSize,
+		BroadcastSize: Conf.Base.BroadcastSize,
 	})
 
 	// log.Infof("server %v", DefaultServer)

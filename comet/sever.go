@@ -13,6 +13,7 @@ type ServerOptions struct {
 	MaxMessageSize  int64
 	ReadBufferSize  int
 	WriteBufferSize int
+	BroadcastSize int
 
 }
 

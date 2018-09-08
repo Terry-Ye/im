@@ -29,8 +29,7 @@ func NewBucket(boptions BucketOptions) (b *Bucket) {
 	b.boptions = boptions
 
 	b.rooms = make(map[int32]*Room, boptions.RoomSize)
-	// tmp
-	b.broadcast = make(chan []byte, 256)
+
 	return
 }
 

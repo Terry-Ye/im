@@ -65,28 +65,32 @@ func serveWs(server *Server, w http.ResponseWriter, r *http.Request) {
 		log.Error(err)
 		return
 	}
+	var ch *Channel
+	// 写入配置
+	ch = NewChannel(server.Options.BroadcastSize)
+	ch.conn = conn
 
 
-	go server.writePump(conn)
-	go server.readPump(conn)
+	go server.writePump(ch)
+	go server.readPump(ch)
 }
 
 
 
-func (s *Server) readPump(conn *websocket.Conn) {
+func (s *Server) readPump(ch *Channel) {
 	defer func() {
-		conn.Close()
+		ch.conn.Close()
 	}()
 
-	conn.SetReadLimit(s.Options.MaxMessageSize)
-	conn.SetReadDeadline(time.Now().Add(s.Options.PongWait))
-	conn.SetPongHandler(func(string) error {
-		conn.SetReadDeadline(time.Now().Add(s.Options.PongWait));
+	ch.conn.SetReadLimit(s.Options.MaxMessageSize)
+	ch.conn.SetReadDeadline(time.Now().Add(s.Options.PongWait))
+	ch.conn.SetPongHandler(func(string) error {
+		ch.conn.SetReadDeadline(time.Now().Add(s.Options.PongWait));
 		return nil
 	})
 
 	for {
-		_, message, err := conn.ReadMessage()
+		_, message, err := ch.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway,websocket.CloseAbnormalClosure) {
 				log.Errorf("readPump ReadMessage err:%v", err)
@@ -98,22 +102,31 @@ func (s *Server) readPump(conn *websocket.Conn) {
 			log.Errorf("message struct %b", connArg)
 		}
 
+
 		b := s.Bucket(connArg.Key)
-		b.broadcast <- message
-		ch := new(Channel)
-		ch.conn = conn
+
+		// b.broadcast <- message
 		err = b.Put(connArg.Key, connArg.RoomId, ch)
 		if err != nil {
-			conn.Close()
+			log.Errorf("conn close err: %s", err)
+			ch.conn.Close()
 		}
+		log.Infof("message  333 :%s", message)
+		ch.broadcast <- message
+
+		// ch.conn = conn
+
+
+
+
 
 
 	}
 }
 
-func (s *Server) writePump(conn *websocket.Conn) {
-	var key = "e4bac70ea5d10dfb"
-	b := s.Bucket(key)
+func (s *Server) writePump(ch *Channel) {
+
+
 
 	ticker := time.NewTicker(s.Options.PingPeriod)
 	log.Printf("ticker :%v", ticker)
@@ -121,29 +134,29 @@ func (s *Server) writePump(conn *websocket.Conn) {
 
 	defer func() {
 		ticker.Stop()
-		conn.Close()
+		ch.conn.Close()
 	}()
 	for {
 		select {
-		case message, ok := <-b.broadcast:
-			conn.SetWriteDeadline(time.Now().Add(s.Options.WriteWait))
+		case message, ok := <- ch.broadcast:
+			ch.conn.SetWriteDeadline(time.Now().Add(s.Options.WriteWait))
 			if !ok {
 				// The hub closed the channel.
-				conn.WriteMessage(websocket.CloseMessage, []byte{})
+				ch.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 			log.Printf("TextMessage :%v", websocket.TextMessage)
-			w, err := conn.NextWriter(websocket.TextMessage)
+			w, err := ch.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
 				return
 			}
 			log.Printf("message :%v", message)
 			w.Write(message)
 			// Add queued chat messages to the current websocket message.
-			n := len(b.broadcast)
+			n := len(ch.broadcast)
 			for i := 0; i < n; i++ {
 				w.Write(newline)
-				w.Write(<-b.broadcast)
+				w.Write(<-ch.broadcast)
 			}
 
 			if err := w.Close(); err != nil {
@@ -151,9 +164,9 @@ func (s *Server) writePump(conn *websocket.Conn) {
 			}
 
 		case <-ticker.C:
-			conn.SetWriteDeadline(time.Now().Add(s.Options.WriteWait))
+			ch.conn.SetWriteDeadline(time.Now().Add(s.Options.WriteWait))
 			log.Printf("websocket.PingMessage :%v", websocket.PingMessage)
-			if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			if err := ch.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
 		}

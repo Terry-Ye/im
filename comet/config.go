@@ -25,6 +25,7 @@ type BaseConf struct {
 	PongWait        time.Duration
 	PingPeriod      time.Duration
 	MaxMessageSize  int64
+	BroadcastSize int
 	ReadBufferSize  int
 	WriteBufferSize int
 }
@@ -79,6 +80,7 @@ func NewConfig() *Config {
 			MaxMessageSize:  512,
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
+			BroadcastSize: 512,
 		},
 		Bucket: BucketConf{
 			Num:      256,
