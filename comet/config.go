@@ -8,6 +8,14 @@ import (
 	"github.com/spf13/viper"
 	"time"
 )
+var (
+	Conf     *Config
+	confPath string
+)
+
+func init() {
+	flag.StringVar(&confPath, "d", "./", " set logic config file path")
+}
 
 type Config struct {
 	Base      BaseConf      `mapstructure:"base"`
@@ -41,14 +49,7 @@ type WebsocketConf struct {
 	Bind string `mapstructure:"bind"` // 性能监控的域名端口
 }
 
-var (
-	Conf     *Config
-	confPath string
-)
 
-func init() {
-	flag.StringVar(&confPath, "d", "./", " set logic config file path")
-}
 
 func InitConfig() (err error) {
 	Conf = NewConfig()
