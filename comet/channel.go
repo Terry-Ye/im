@@ -3,12 +3,12 @@ package main
 import "github.com/gorilla/websocket"
 
 type Channel struct {
-	Room   *Room
-	// signal chan *proto.Proto
+	Room      *Room
 	broadcast chan []byte
-	conn *websocket.Conn
-	Next     *Channel
-	Prev     *Channel
+	uid       string
+	conn      *websocket.Conn
+	Next      *Channel
+	Prev      *Channel
 }
 
 func NewChannel(svr int) *Channel {

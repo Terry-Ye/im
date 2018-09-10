@@ -1,0 +1,7 @@
+[base]
+pidfile = "/tmp/logic.pid"
+HttpAddrs = "localhost:6921"
+RedisAddr = "localhost:6379"
+redisPw = "123456"
+
+

@@ -27,6 +27,9 @@ func main() {
 
 	// log.Info("111 noteworthy happened!")
 	// 加入监控 后补
+	if err := InitRedis(); err != nil {
+		log.Panic(fmt.Errorf("InitRedis() fatal error : %s \n", err))
+	}
 
 	if err := InitHttp(); err != nil {
 		log.Panic(fmt.Errorf("InitHttp() fatal error : %s \n", err))

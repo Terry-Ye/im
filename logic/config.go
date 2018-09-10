@@ -2,13 +2,11 @@ package main
 
 import (
 	"runtime"
-	"time"
 	"flag"
 	"github.com/spf13/viper"
 	// "github.com/go-redis/redis"
 	"fmt"
 )
-
 
 var (
 	Conf     *Config
@@ -20,17 +18,19 @@ func init() {
 }
 
 type Config struct {
-	Base      BaseConf      `mapstructure:"base"`
-	Bucket    BucketConf    `mapstructure:"bucket"`
+	Base BaseConf `mapstructure:"base"`
+	// Bucket BucketConf `mapstructure:"bucket"`
 }
-
 
 // 基础的配置信息
 type BaseConf struct {
-	Pidfile         string `mapstructure:"pidfile"`
-	MaxProc         int
-	PprofAddrs       []string `mapstructure:"pprofBind"` // 性能监控的域名端口
-
+	Pidfile        string   `mapstructure:"pidfile"`
+	MaxProc        int
+	PprofAddrs     []string `mapstructure:"pprofBind"` //
+	HttpAddrs      []string `mapstructure:"httpAddr"`  //
+	RedisAddr      string   `mapstructure:"RedisAddr"` //
+	RedisPw        string   `mapstructure:"redisPw"`
+	RedisDefaultDB int      `mapstructure:"redisDefaultDB"`
 }
 
 func InitConfig() (err error) {
@@ -49,17 +49,17 @@ func InitConfig() (err error) {
 	return nil
 }
 
-
 func NewConfig() *Config {
 	return &Config{
 		Base: BaseConf{
-			Pidfile:         "/tmp/logic.pid",
-
+			Pidfile:        "/tmp/logic.pid",
 			MaxProc:        runtime.NumCPU(),
-			PprofAddrs:     []string{"localhost:6971"},
-			// RedisAddrs:     []string{"localhost:6973"},
+			PprofAddrs:     []string{"localhost:6922"},
+			HttpAddrs:      []string{"localhost:6921"},
+			RedisAddr:      "localhost:6379",
+			RedisPw:        "123456",
+			RedisDefaultDB: 0
 		},
-
 	}
 }
 
