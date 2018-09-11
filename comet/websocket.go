@@ -105,7 +105,8 @@ func (s *Server) readPump(ch *Channel) {
 
 		b := s.Bucket(connArg.Key)
 
-		// rpc 操作获取uid 存入ch 未写
+		// rpc 操作获取uid 存入ch 存入Server 未写
+
 
 		// b.broadcast <- message
 		err = b.Put(connArg.Key, connArg.RoomId, ch)

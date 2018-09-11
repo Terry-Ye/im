@@ -31,6 +31,7 @@ func getRouter(auth string) (router *proto.Router, err error) {
 	if err != nil {
 		return
 	}
-	router = &proto.Router{ServerId: sid, RoomId: rid, UserId: uid}
+	router = &proto.Router{ServerId: int8(sid), RoomId: int32(rid), UserId: uid}
+	return
 
 }

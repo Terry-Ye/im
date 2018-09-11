@@ -27,6 +27,11 @@ func main() {
 	// log.Info("111 noteworthy happened!")
 	// 加入性能监控
 	perf.Init(Conf.Base.PprofBind)
+
+	if err := InitLogicRpc(); err != nil {
+		log.Panicf(fmt.Errorf("InitLogicRpc Fatal error: %s \n", err))
+	}
+
 	// new server
 	Buckets := make([]*Bucket, Conf.Bucket.Num)
 

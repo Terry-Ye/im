@@ -23,8 +23,12 @@ func main() {
 	}
 	// 设置cpu 核数
 	runtime.GOMAXPROCS(Conf.Base.MaxProc)
-	// 使用logrus包
 
+
+
+	if err := InitRPC(); err != nil {
+		log.Panic(fmt.Errorf("InitRPC() fatal error : %s \n", err))
+	}
 	// log.Info("111 noteworthy happened!")
 	// 加入监控 后补
 	if err := InitRedis(); err != nil {

@@ -31,6 +31,7 @@ type BaseConf struct {
 	RedisAddr      string   `mapstructure:"RedisAddr"` //
 	RedisPw        string   `mapstructure:"redisPw"`
 	RedisDefaultDB int      `mapstructure:"redisDefaultDB"`
+	RPCAddrs       []string `mapstructure:"RPCAddrs"` //
 }
 
 func InitConfig() (err error) {
@@ -58,7 +59,8 @@ func NewConfig() *Config {
 			HttpAddrs:      []string{"localhost:6921"},
 			RedisAddr:      "localhost:6379",
 			RedisPw:        "123456",
-			RedisDefaultDB: 0
+			RedisDefaultDB: 0,
+			RPCAddrs:       []string{"localhost:6923"},
 		},
 	}
 }

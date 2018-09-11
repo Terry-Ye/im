@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"time"
 )
+
 var (
 	Conf     *Config
 	confPath string
@@ -25,15 +26,16 @@ type Config struct {
 
 // 基础的配置信息
 type BaseConf struct {
-	Pidfile         string `mapstructure:"pidfile"`
+	Pidfile         string   `mapstructure:"pidfile"`
 	MaxProc         int
 	PprofBind       []string `mapstructure:"pprofBind"` // 性能监控的域名端口
 	Logfile         string   `mapstructure:"logfile"`   // log 文件
+	RpcLogicAddr    []string `mapstructure:"rpcLogicAddr"`
 	WriteWait       time.Duration
 	PongWait        time.Duration
 	PingPeriod      time.Duration
 	MaxMessageSize  int64
-	BroadcastSize int
+	BroadcastSize   int
 	ReadBufferSize  int
 	WriteBufferSize int
 }
@@ -48,8 +50,6 @@ type BucketConf struct {
 type WebsocketConf struct {
 	Bind string `mapstructure:"bind"` // 性能监控的域名端口
 }
-
-
 
 func InitConfig() (err error) {
 	Conf = NewConfig()
@@ -71,9 +71,10 @@ func InitConfig() (err error) {
 func NewConfig() *Config {
 	return &Config{
 		Base: BaseConf{
-			Pidfile:         "/tmp/comet.pid",
-			Logfile:         "/Users/AT/go/src/im/logs/comet/comet.log",
-			MaxProc:         runtime.NumCPU(),
+			Pidfile: "/tmp/comet.pid",
+			Logfile: "/Users/AT/go/src/im/logs/comet/comet.log",
+			MaxProc: runtime.NumCPU(),
+			RpcLogicAddr: []string{"localhost:6923"},
 			PprofBind:       []string{"localhost:7911"},
 			WriteWait:       10 * time.Second,
 			PongWait:        60 * time.Second,
