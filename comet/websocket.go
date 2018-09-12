@@ -14,6 +14,7 @@ var (
 	newline = []byte{'\n'}
 	space   = []byte{' '}
 )
+
 func serveHome(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL)
 	if r.URL.Path != "/" {
@@ -28,36 +29,21 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func InitWebsocket(bind string) (err error) {
-	log.Infof("size: %d",DefaultServer.Options.ReadBufferSize)
-
-
-
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-
 		serveWs(DefaultServer, w, r)
 	})
 
-
 	err = http.ListenAndServe(bind, nil)
-
 	return err
-
 }
 
 // serveWs handles websocket requests from the peer.
 func serveWs(server *Server, w http.ResponseWriter, r *http.Request) {
-	// upgrader := websocket.Upgrader{
-	// 	ReadBufferSize:  DefaultServer.Options.ReadBufferSize,
-	// 	WriteBufferSize: DefaultServer.Options.WriteBufferSize,
-	// }
-
-
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  DefaultServer.Options.ReadBufferSize,
 		WriteBufferSize: DefaultServer.Options.WriteBufferSize,
 	}
-
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 
@@ -70,12 +56,9 @@ func serveWs(server *Server, w http.ResponseWriter, r *http.Request) {
 	ch = NewChannel(server.Options.BroadcastSize)
 	ch.conn = conn
 
-
 	go server.writePump(ch)
 	go server.readPump(ch)
 }
-
-
 
 func (s *Server) readPump(ch *Channel) {
 	defer func() {
@@ -92,24 +75,22 @@ func (s *Server) readPump(ch *Channel) {
 	for {
 		_, message, err := ch.conn.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway,websocket.CloseAbnormalClosure) {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Errorf("readPump ReadMessage err:%v", err)
 			}
 		}
-		var connArg  proto.ConnArg
+		var connArg proto.ConnArg
 		log.Infof("message :%s", message)
-		if err := json.Unmarshal([]byte(message), &connArg); err != nil  {
+		if err := json.Unmarshal([]byte(message), &connArg); err != nil {
 			log.Errorf("message struct %b", connArg)
 		}
-
-
-		b := s.Bucket(connArg.Key)
+		connect(connArg)
+		b := s.Bucket(connArg.Auth)
 
 		// rpc 操作获取uid 存入ch 存入Server 未写
 
-
 		// b.broadcast <- message
-		err = b.Put(connArg.Key, connArg.RoomId, ch)
+		err = b.Put(connArg.Auth, connArg.RoomId, ch)
 		if err != nil {
 			log.Errorf("conn close err: %s", err)
 			ch.conn.Close()
@@ -117,23 +98,12 @@ func (s *Server) readPump(ch *Channel) {
 		log.Infof("message  333 :%s", message)
 		ch.broadcast <- message
 
-		// ch.conn = conn
-
-
-
-
-
-
 	}
 }
 
 func (s *Server) writePump(ch *Channel) {
-
-
-
 	ticker := time.NewTicker(s.Options.PingPeriod)
 	log.Printf("ticker :%v", ticker)
-
 
 	defer func() {
 		ticker.Stop()
@@ -141,7 +111,7 @@ func (s *Server) writePump(ch *Channel) {
 	}()
 	for {
 		select {
-		case message, ok := <- ch.broadcast:
+		case message, ok := <-ch.broadcast:
 			ch.conn.SetWriteDeadline(time.Now().Add(s.Options.WriteWait))
 			if !ok {
 				// The hub closed the channel.
@@ -175,6 +145,3 @@ func (s *Server) writePump(ch *Channel) {
 		}
 	}
 }
-
-
-
