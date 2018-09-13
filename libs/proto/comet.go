@@ -9,7 +9,4 @@ package proto
 
 
 
-type ConnArg struct {
-	Auth string `json:"auth"`
-	RoomId int32 `json:"roomId"`
-}
+

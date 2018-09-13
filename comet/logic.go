@@ -26,16 +26,17 @@ func InitLogicRpc() (err error) {
 	d := client.NewMultipleServersDiscovery(Server)
 	logicRpcClient = client.NewXClient("Logic", client.Failtry, client.RandomSelect, d, client.DefaultOption)
 	log.Debugf("comet InitLogicRpc Server : %v ", Server)
-
+	return
 }
 
-func connect(connArg proto.ConnArg) (reply proto.ConnReply){
+func connect(connArg proto.ConnArg) (uid string, err error){
 
-
-	err := logicRpcClient.Call(context.Background(), "Logic.Connect", connArg, &reply)
+	var reply proto.ConnReply
+	err = logicRpcClient.Call(context.Background(), "Logic.Connect", connArg, &reply)
 	if err != nil {
 		log.Fatalf("failed to call: %v", err)
 	}
+	uid = reply.Uid
 	log.Debugf("%d * %d = %d", reply.Uid)
 
 }

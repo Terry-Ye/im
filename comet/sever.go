@@ -21,14 +21,16 @@ type Server struct {
 	Buckets []*Bucket // subkey bucket
 	Options ServerOptions
 	bucketIdx uint32
+	operator  Operator
 }
 
 // NewServer returns a new Server.
-func NewServer(b []*Bucket, options ServerOptions) *Server {
+func NewServer(b []*Bucket,o Operator, options ServerOptions) *Server {
 	s := new(Server)
 	s.Buckets = b
 	s.Options = options
 	s.bucketIdx = uint32(len(b))
+	s.operator = o
 	return s
 }
 

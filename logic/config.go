@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/viper"
 	// "github.com/go-redis/redis"
 	"fmt"
+	"time"
 )
 
 var (
@@ -32,10 +33,13 @@ type BaseConf struct {
 	RedisPw        string   `mapstructure:"redisPw"`
 	RedisDefaultDB int      `mapstructure:"redisDefaultDB"`
 	RPCAddrs       []string `mapstructure:"RPCAddrs"` //
+	HTTPReadTimeout  time.Duration `mapstructure:"HTTPReadTimeout"`
+	HTTPWriteTimeout time.Duration `mapstructure:"HTTPWriteTimeout"`
 }
 
 func InitConfig() (err error) {
-	viper.SetConfigName("comet")
+	Conf = NewConfig()
+	viper.SetConfigName("logic")
 	viper.SetConfigType("toml")
 	viper.AddConfigPath(confPath)
 
@@ -56,11 +60,13 @@ func NewConfig() *Config {
 			Pidfile:        "/tmp/logic.pid",
 			MaxProc:        runtime.NumCPU(),
 			PprofAddrs:     []string{"localhost:6922"},
-			HttpAddrs:      []string{"localhost:6921"},
-			RedisAddr:      "localhost:6379",
-			RedisPw:        "123456",
+			HttpAddrs:      []string{"tcp@0.0.0.0:6921"},
+			RedisAddr:      "127.0.0.1:6379",
+			RedisPw:        "",
 			RedisDefaultDB: 0,
 			RPCAddrs:       []string{"localhost:6923"},
+			HTTPReadTimeout: 10  * time.Second,
+			HTTPWriteTimeout: 20  * time.Second,
 		},
 	}
 }

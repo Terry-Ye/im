@@ -41,7 +41,9 @@ func main() {
 			RoomSize:    Conf.Bucket.Room,
 		})
 	}
-	DefaultServer = NewServer(Buckets, ServerOptions{
+
+	operator = new(DefaultOperator)
+	DefaultServer = NewServer(Buckets,operator, ServerOptions{
 		WriteWait:       Conf.Base.WriteWait,
 		PongWait:        Conf.Base.PongWait,
 		PingPeriod:      Conf.Base.PingPeriod,
