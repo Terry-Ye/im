@@ -79,18 +79,27 @@ func (s *Server) readPump(ch *Channel) {
 				log.Errorf("readPump ReadMessage err:%v", err)
 			}
 		}
-		var connArg proto.ConnArg
+		var(
+			connArg *proto.ConnArg
+
+		)
 		log.Infof("message :%s", message)
 		if err := json.Unmarshal([]byte(message), &connArg); err != nil {
 			log.Errorf("message struct %b", connArg)
 		}
-		connect(connArg)
-		b := s.Bucket(connArg.Auth)
+		uid, err := s.operator.Connect(connArg)
+		log.Infof("websocket uid:%s", uid)
+		if err != nil {
+			log.Errorf("s.operator.Connect error %s", err)
+		}
+
+
+		b := s.Bucket(uid)
 
 		// rpc 操作获取uid 存入ch 存入Server 未写
 
 		// b.broadcast <- message
-		err = b.Put(connArg.Auth, connArg.RoomId, ch)
+		err = b.Put(uid, connArg.RoomId, ch)
 		if err != nil {
 			log.Errorf("conn close err: %s", err)
 			ch.conn.Close()

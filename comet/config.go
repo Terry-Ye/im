@@ -74,7 +74,7 @@ func NewConfig() *Config {
 			Pidfile: "/tmp/comet.pid",
 			Logfile: "/Users/AT/go/src/im/logs/comet/comet.log",
 			MaxProc: runtime.NumCPU(),
-			RpcLogicAddr: []string{"localhost:6923"},
+			RpcLogicAddr: []string{"tpc@localhost:6923"},
 			PprofBind:       []string{"localhost:7911"},
 			WriteWait:       10 * time.Second,
 			PongWait:        60 * time.Second,

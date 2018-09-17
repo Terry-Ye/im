@@ -13,19 +13,18 @@ type ServerOptions struct {
 	MaxMessageSize  int64
 	ReadBufferSize  int
 	WriteBufferSize int
-	BroadcastSize int
-
+	BroadcastSize   int
 }
 
 type Server struct {
-	Buckets []*Bucket // subkey bucket
-	Options ServerOptions
+	Buckets   []*Bucket // subkey bucket
+	Options   ServerOptions
 	bucketIdx uint32
 	operator  Operator
 }
 
 // NewServer returns a new Server.
-func NewServer(b []*Bucket,o Operator, options ServerOptions) *Server {
+func NewServer(b []*Bucket, o Operator, options ServerOptions) *Server {
 	s := new(Server)
 	s.Buckets = b
 	s.Options = options
@@ -37,7 +36,7 @@ func NewServer(b []*Bucket,o Operator, options ServerOptions) *Server {
 func (server *Server) Bucket(subKey string) *Bucket {
 	idx := cityhash.CityHash32([]byte(subKey), uint32(len(subKey))) % server.bucketIdx
 	// if Debug {
-		log.Printf("\"%s\" hit channel bucket index: %d use cityhash", subKey, idx)
+	log.Printf("\"%s\" hit channel bucket index: %d use cityhash", subKey, idx)
 	// }
 	return server.Buckets[idx]
 }

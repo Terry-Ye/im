@@ -1,7 +1,7 @@
 [base]
 pidfile = "/tmp/comet.pid"
 logfile = "/Users/AT/go/src/im/logs/comet/comet.log"
-rpcLogicAddr = "0.0.0.0:7912"
+rpcLogicAddr = "tcp@0.0.0.0:6923"
 
 
 [websocket]

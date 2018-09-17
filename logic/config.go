@@ -64,7 +64,7 @@ func NewConfig() *Config {
 			RedisAddr:      "127.0.0.1:6379",
 			RedisPw:        "",
 			RedisDefaultDB: 0,
-			RPCAddrs:       []string{"localhost:6923"},
+			RPCAddrs:       []string{"tcp@localhost:6923"},
 			HTTPReadTimeout: 10  * time.Second,
 			HTTPWriteTimeout: 20  * time.Second,
 		},

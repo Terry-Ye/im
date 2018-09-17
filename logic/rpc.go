@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/smallnest/rpcx/server"
-	"context"
 	inet "im/libs/net"
-
+	"context"
+	log "github.com/sirupsen/logrus"
 	"im/libs/proto"
-	"github.com/smallnest/rpcx/log"
+
 )
 
 type LogicRpc int
@@ -24,7 +24,6 @@ func InitRPC() (err error) {
 	}
 	// select {}
 	return
-
 }
 
 func createServer(network string, addr string) {
@@ -36,16 +35,19 @@ func createServer(network string, addr string) {
 }
 
 func (rpc *LogicRpc) Connect(ctx context.Context, args *proto.ConnArg, reply *proto.ConnReply) (err error) {
-
+	log.Info("rpc logic 2  rpc uid ")
 	if args == nil {
-		err = ErrConnectArgs
-		log.Error("Connect() error(%v)", err)
+		log.Errorf("Connect() error(%v)", err)
 		return
 	}
+	reply.Uid = "555"
+	log.Infof("logic rpc uid:%s", reply.Uid)
 
-	reply.Uid = "333333"
 	return
 }
+
+
+
 
 //
 

@@ -54,10 +54,13 @@ func Push(w http.ResponseWriter, r *http.Request) {
 		log.Errorf("get router error : %s", err)
 		return
 	}
+
+	log.Infof("router info %v", router)
+
 	if bodyBytes, err = ioutil.ReadAll(r.Body); err != nil {
 		log.Errorf("get router error : %s", err)
 	}
-	log.Debug(bodyBytes)
+	log.Infof("get bodyBytes : %s", bodyBytes)
 
 }
 

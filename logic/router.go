@@ -4,7 +4,6 @@ import (
 	"im/libs/proto"
 	"bytes"
 	"strconv"
-	log "github.com/sirupsen/logrus"
 	"im/libs/define"
 )
 
@@ -13,13 +12,13 @@ func getRouter(auth string) (router *proto.Router, err error) {
 	var key bytes.Buffer
 	key.WriteString(define.REDIS_AUTH_PREFIX)
 	key.WriteString(auth)
-	log.Info("userinfo ", key.String())
+
 
 	userInfo, err := RedisCli.HGetAll(key.String()).Result()
 	if err != nil {
 		return
 	}
-	log.Infof("userinfo %v", userInfo)
+
 	uid, err := strconv.ParseInt(userInfo["UserId"], 10, 64)
 	if err != nil {
 		return

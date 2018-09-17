@@ -34,9 +34,9 @@ func main() {
 	if err := InitRedis(); err != nil {
 		log.Panic(fmt.Errorf("InitRedis() fatal error : %s \n", err))
 	}
-	// UserId, _ := RedisCli.HGet("im_auth_555","UserId").Result()
-	//
-	// log.Info("UserId ", UserId)
+
+
+
 	if err := InitHTTP(); err != nil {
 		log.Panic(fmt.Errorf("InitHttp() fatal error : %s \n", err))
 	}

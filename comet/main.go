@@ -29,7 +29,8 @@ func main() {
 	perf.Init(Conf.Base.PprofBind)
 
 	if err := InitLogicRpc(); err != nil {
-		log.Panicf(fmt.Errorf("InitLogicRpc Fatal error: %s \n", err))
+
+		log.Panicf("InitLogicRpc Fatal error: %s \n", err)
 	}
 
 	// new server
@@ -41,9 +42,8 @@ func main() {
 			RoomSize:    Conf.Bucket.Room,
 		})
 	}
-
-	operator = new(DefaultOperator)
-	DefaultServer = NewServer(Buckets,operator, ServerOptions{
+	operator := new(DefaultOperator)
+	DefaultServer = NewServer(Buckets, operator, ServerOptions{
 		WriteWait:       Conf.Base.WriteWait,
 		PongWait:        Conf.Base.PongWait,
 		PingPeriod:      Conf.Base.PingPeriod,
