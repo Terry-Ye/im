@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"strconv"
 	"im/libs/define"
+	"github.com/smallnest/rpcx/log"
 )
 
 
@@ -13,12 +14,12 @@ func getRouter(auth string) (router *proto.Router, err error) {
 	key.WriteString(define.REDIS_AUTH_PREFIX)
 	key.WriteString(auth)
 
-
+	log.Infof("key %s", key.String())
 	userInfo, err := RedisCli.HGetAll(key.String()).Result()
 	if err != nil {
 		return
 	}
-
+	log.Infof("userid %v", userInfo)
 	uid, err := strconv.ParseInt(userInfo["UserId"], 10, 64)
 	if err != nil {
 		return

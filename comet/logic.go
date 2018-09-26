@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"im/libs/proto"
 	"context"
+	"im/libs/define"
 )
 
 var (
@@ -26,7 +27,7 @@ func InitLogicRpc() (err error) {
 	d := client.NewMultipleServersDiscovery(LogicAddrs)
 	// d := client.NewMultipleServersDiscovery([]*client.KVPair{{Key: "tcp@0.0.0.0:6923"}})
 
-	logicRpcClient = client.NewXClient("LogicRpc", client.Failover, client.RoundRobin, d, client.DefaultOption)
+	logicRpcClient = client.NewXClient(define.RPC_LOGIC_SERVER_PATH, client.Failover, client.RoundRobin, d, client.DefaultOption)
 	log.Infof("comet InitLogicRpc Server : %v ", logicRpcClient)
 	return
 }

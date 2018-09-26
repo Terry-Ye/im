@@ -3,14 +3,14 @@ package main
 import (
 	"github.com/go-redis/redis"
 	log "github.com/sirupsen/logrus"
+	"im/libs/define"
+	"im/libs/proto"
 )
 var (
 	RedisCli *redis.Client
 
 )
-const (
-	REDIS_PUSH_CODE = "redis_push"
-)
+
 
 func InitRedis() (err error) {
 	RedisCli = redis.NewClient(&redis.Options{
@@ -24,3 +24,17 @@ func InitRedis() (err error) {
 
 	return
 }
+
+// 发布订阅消息
+func RedisPublishCh(serverId int8, uid string , msg []byte ) (err error) {
+	var redisMsg = &proto.RedisMsg{Op:define.REDIS_MESSAGE_BROADCAST, ServerId:serverId, UserId:uid,Msg:msg}
+	err = RedisCli.Publish(define.REDIS_SUB_CHANNEL, redisMsg).Err()
+	return
+}
+
+
+
+
+
+
+

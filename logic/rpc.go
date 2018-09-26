@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"im/libs/proto"
 
+	"im/libs/define"
 )
 
 type LogicRpc int
@@ -29,7 +30,7 @@ func InitRPC() (err error) {
 func createServer(network string, addr string) {
 
 	s := server.NewServer()
-	s.RegisterName("LogicRpc", new(LogicRpc), "")
+	s.RegisterName(define.RPC_LOGIC_SERVER_PATH, new(LogicRpc), "")
 	s.Serve(network, addr)
 
 }
