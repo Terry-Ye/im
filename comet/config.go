@@ -31,6 +31,7 @@ type BaseConf struct {
 	PprofBind       []string `mapstructure:"pprofBind"` // 性能监控的域名端口
 	Logfile         string   `mapstructure:"logfile"`   // log 文件
 	RpcLogicAddr    []string `mapstructure:"rpcLogicAddr"`
+	RpcPushAddr     []string `mapstructure:"rpcPushAddr"`
 	WriteWait       time.Duration
 	PongWait        time.Duration
 	PingPeriod      time.Duration
@@ -75,6 +76,7 @@ func NewConfig() *Config {
 			Logfile: "/Users/AT/go/src/im/logs/comet/comet.log",
 			MaxProc: runtime.NumCPU(),
 			RpcLogicAddr: []string{"tpc@localhost:6923"},
+			RpcPushAddr: []string{"tpc@localhost:6912"},
 			PprofBind:       []string{"localhost:7911"},
 			WriteWait:       10 * time.Second,
 			PongWait:        60 * time.Second,

@@ -1,0 +1,14 @@
+[base]
+pidfile = "/tmp/job.pid"
+
+redisAddr = "localhost:6379"
+redisPw = ""
+RPCAddrs = "tcp@localhost:6923"
+
+
+
+[cometsAddrs]
+    [cometsAddrs.1]
+    addr = tcp@0.0.0.0:6912
+    [cometsAddrs.2]
+    addr = tcp@0.0.0.0:6913

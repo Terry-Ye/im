@@ -59,6 +59,11 @@ func main() {
 	if err := InitWebsocket(Conf.Websocket.Bind); err != nil {
 		log.Fatal(err)
 	}
+
+
+	if err := InitPushRpc(Conf.Base.RpcPushAddr); err != nil {
+		log.Fatal(err)
+	}
 	log.Infof("size2: %d",DefaultServer.Options.ReadBufferSize)
 
 
