@@ -17,12 +17,11 @@ func main() {
 	if err := InitConfig(); err != nil {
 		log.Errorf("Fatal error config file: %s \n", err)
 	}
-
-
+	log.Infof("conf :%v", Conf)
 
 	// 设置cpu 核数
 	runtime.GOMAXPROCS(Conf.Base.MaxProc)
-
+	log.Infof("key :%v",Conf.CometConf[0].Key)
 	// 初始化redis
 	if err := InitRedis(); err != nil {
 		log.Panic(fmt.Errorf("InitRedis() fatal error : %s \n", err))
@@ -41,10 +40,7 @@ func main() {
 
 
 
-
-	if err := InitHTTP(); err != nil {
-		log.Panic(fmt.Errorf("InitHttp() fatal error : %s \n", err))
-	}
+	//
 
 
 

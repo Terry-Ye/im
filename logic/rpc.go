@@ -18,9 +18,11 @@ func InitRPC() (err error) {
 		network, addr string
 	)
 	for _, bind := range Conf.Base.RPCAddrs {
+		log.Infof("RPCAddrs :%v", bind)
 		if network, addr, err = inet.ParseNetwork(bind); err != nil {
 			log.Panicf("InitLogicRpc ParseNetwork error : %s", err)
 		}
+
 		go createServer(network, addr)
 	}
 	// select {}

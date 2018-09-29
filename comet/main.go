@@ -28,7 +28,7 @@ func main() {
 	// 加入性能监控
 	perf.Init(Conf.Base.PprofBind)
 
-	if err := InitLogicRpc(); err != nil {
+	if err := InitLogicRpc(Conf.RpcLogicAddrs); err != nil {
 
 		log.Panicf("InitLogicRpc Fatal error: %s \n", err)
 	}
@@ -50,7 +50,7 @@ func main() {
 		MaxMessageSize:  Conf.Base.MaxMessageSize,
 		ReadBufferSize:  Conf.Base.ReadBufferSize,
 		WriteBufferSize: Conf.Base.WriteBufferSize,
-		BroadcastSize: Conf.Base.BroadcastSize,
+		BroadcastSize:   Conf.Base.BroadcastSize,
 	})
 
 	// log.Infof("server %v", DefaultServer)
@@ -60,11 +60,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-
-	if err := InitPushRpc(Conf.Base.RpcPushAddr); err != nil {
+	if err := InitPushRpc(Conf.RpcPushAdds); err != nil {
 		log.Fatal(err)
 	}
-	log.Infof("size2: %d",DefaultServer.Options.ReadBufferSize)
-
+	log.Infof("size2: %d", DefaultServer.Options.ReadBufferSize)
 
 }

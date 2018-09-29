@@ -1,22 +1,23 @@
 package main
 
 import (
-	"github.com/smallnest/rpcx/server"
+
 	inet "im/libs/net"
 	"context"
 	log "github.com/sirupsen/logrus"
 	"im/libs/proto"
 	"im/libs/define"
+	"github.com/smallnest/rpcx/server"
 )
 
 type PushRpc int
 
-func InitPushRpc(addrs []string) (err error){
+func InitPushRpc(addrs []RpcPushAddrs) (err error){
 	var (
 		network, addr string
 	)
 	for _, bind := range addrs {
-		if network, addr, err = inet.ParseNetwork(bind); err != nil {
+		if network, addr, err = inet.ParseNetwork(bind.Addr); err != nil {
 			log.Panicf("InitLogicRpc ParseNetwork error : %s", err)
 		}
 		go createServer(network, addr)
@@ -33,6 +34,7 @@ func createServer(network string, addr string) {
 
 
 func (rpc *PushRpc) PushMsg(ctx context.Context, args *proto.PushMsgArg, noReply *proto.NoReply) (err error) {
+
 	log.Info("rpc PushMsg :%v ", args)
 	if args == nil {
 		log.Errorf("rpc PushRpc() error(%v)", err)

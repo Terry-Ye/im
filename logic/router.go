@@ -20,10 +20,8 @@ func getRouter(auth string) (router *proto.Router, err error) {
 		return
 	}
 	log.Infof("userid %v", userInfo)
-	uid, err := strconv.ParseInt(userInfo["UserId"], 10, 64)
-	if err != nil {
-		return
-	}
+
+
 	rid, err := strconv.ParseInt(userInfo["RoomId"], 10, 32)
 	if err != nil {
 		return
@@ -32,7 +30,7 @@ func getRouter(auth string) (router *proto.Router, err error) {
 	if err != nil {
 		return
 	}
-	router = &proto.Router{ServerId: int8(sid), RoomId: int32(rid), UserId: uid}
+	router = &proto.Router{ServerId: int8(sid), RoomId: int32(rid), UserId: userInfo["UserId"]}
 	return
 
 }

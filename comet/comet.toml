@@ -1,12 +1,23 @@
 [base]
 pidfile = "/tmp/comet.pid"
 logfile = "/Users/AT/go/src/im/logs/comet/comet.log"
-rpcLogicAddr = "tcp@0.0.0.0:6923"
-rpcPushAddr = "tcp@0.0.0.0:6912"
 
 [websocket]
 bind = "0.0.0.0:6911"
 
+
+[[rpcLogicAddrs]]
+key = 1
+addr = "tcp@0.0.0.0:6923"
+
+[[rpcPushAddrs]]
+key = 1
+addr = "tcp@0.0.0.0:6912"
+
+
+[[rpcPushAddrs]]
+key = 2
+addr = "tcp@0.0.0.0:6913"
 
 
 [bucket]

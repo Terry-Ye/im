@@ -19,9 +19,21 @@ func init() {
 }
 
 type Config struct {
-	Base      BaseConf      `mapstructure:"base"`
-	Websocket WebsocketConf `mapstructure:"websocket"`
-	Bucket    BucketConf    `mapstructure:"bucket"`
+	Base         BaseConf        `mapstructure:"base"`
+	Websocket    WebsocketConf   `mapstructure:"websocket"`
+	Bucket       BucketConf      `mapstructure:"bucket"`
+	RpcPushAdds  []RpcPushAddrs  `mapstructure:"rpcPushAddrs"`
+	RpcLogicAddrs []RpcLogicAddrs `mapstructure:"rpcLogicAddrs"`
+}
+
+type RpcPushAddrs struct {
+	Key  int8   `mapstructure:"key"`
+	Addr string `mapstructure:"addr"`
+}
+
+type RpcLogicAddrs struct {
+	Key  int8   `mapstructure:"key"`
+	Addr string `mapstructure:"addr"`
 }
 
 // 基础的配置信息
@@ -30,8 +42,6 @@ type BaseConf struct {
 	MaxProc         int
 	PprofBind       []string `mapstructure:"pprofBind"` // 性能监控的域名端口
 	Logfile         string   `mapstructure:"logfile"`   // log 文件
-	RpcLogicAddr    []string `mapstructure:"rpcLogicAddr"`
-	RpcPushAddr     []string `mapstructure:"rpcPushAddr"`
 	WriteWait       time.Duration
 	PongWait        time.Duration
 	PingPeriod      time.Duration
@@ -72,11 +82,9 @@ func InitConfig() (err error) {
 func NewConfig() *Config {
 	return &Config{
 		Base: BaseConf{
-			Pidfile: "/tmp/comet.pid",
-			Logfile: "/Users/AT/go/src/im/logs/comet/comet.log",
-			MaxProc: runtime.NumCPU(),
-			RpcLogicAddr: []string{"tpc@localhost:6923"},
-			RpcPushAddr: []string{"tpc@localhost:6912"},
+			Pidfile:         "/tmp/comet.pid",
+			Logfile:         "/Users/AT/go/src/im/logs/comet/comet.log",
+			MaxProc:         runtime.NumCPU(),
 			PprofBind:       []string{"localhost:7911"},
 			WriteWait:       10 * time.Second,
 			PongWait:        60 * time.Second,
@@ -84,7 +92,7 @@ func NewConfig() *Config {
 			MaxMessageSize:  512,
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
-			BroadcastSize: 512,
+			BroadcastSize:   512,
 		},
 		Bucket: BucketConf{
 			Num:      256,

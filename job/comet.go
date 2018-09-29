@@ -1,31 +1,37 @@
 package main
 
 import (
-	"github.com/smallnest/rpcx/log"
-	inet "im/libs/net"
-
+	log "github.com/sirupsen/logrus"
 	"im/libs/define"
-	"github.com/smallnest/rpcx/server"
+
+	"github.com/smallnest/rpcx/client"
 )
 
 type CometRpc int
 
-func InitComets(cometConf map[string]string) (err error)  {
-	var (
-		network, addr string
-	)
-	for key, bind := range cometConf {
-		if network, addr, err = inet.ParseNetwork(bind); err != nil {
-			log.Error("inet.ParseNetwork() error(%v)", err)
-			return
-		}
-		go createServer(network, addr)
-	}
-}
-func createServer(network string, addr string) {
+var (
+	logicRpcClient client.XClient
+)
 
-	s := server.NewServer()
-	s.RegisterName(define.RPC_COMET_SERVER_PATH, new(CometRpc), "")
-	s.Serve(network, addr)
+func InitComets(cometConf []CometConf) (err error)  {
+	log.Infof("len : %d ", len(cometConf))
+	LogicAddrs := make([]*client.KVPair, len(cometConf))
+	log.Infof("cometConf : %v ", cometConf)
+
+	for i, bind := range cometConf {
+		log.Infof("bind key %d", bind.Key)
+		log.Infof("bind key %s", bind.Addr)
+		b := new(client.KVPair)
+		b.Key = bind.Addr
+		// 需要转int 类型
+		LogicAddrs[i] = b
+
+	}
+	log.Infof("LogicAddrs %v", LogicAddrs)
+	d := client.NewMultipleServersDiscovery(LogicAddrs)
+
+	logicRpcClient = client.NewXClient(define.RPC_LOGIC_SERVER_PATH, client.Failover, client.RoundRobin, d, client.DefaultOption)
+	log.Infof("comet InitLogicRpc Server : %v ", logicRpcClient)
+	return
 
 }

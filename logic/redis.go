@@ -5,12 +5,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	"im/libs/define"
 	"im/libs/proto"
+	"encoding/json"
 )
+
 var (
 	RedisCli *redis.Client
-
 )
-
 
 func InitRedis() (err error) {
 	RedisCli = redis.NewClient(&redis.Options{
@@ -26,15 +26,13 @@ func InitRedis() (err error) {
 }
 
 // 发布订阅消息
-func RedisPublishCh(serverId int8, uid string , msg []byte ) (err error) {
-	var redisMsg = &proto.RedisMsg{Op:define.REDIS_MESSAGE_BROADCAST, ServerId:serverId, UserId:uid,Msg:msg}
-	err = RedisCli.Publish(define.REDIS_SUB_CHANNEL, redisMsg).Err()
+func RedisPublishCh(serverId int8, uid string, msg []byte) (err error) {
+	var redisMsg = &proto.RedisMsg{Op: define.REDIS_MESSAGE_BROADCAST, ServerId: serverId, UserId: uid, Msg: msg}
+
+	redisMsgStr, err := json.Marshal(redisMsg)
+
+	log.Infof("redisMsg info : %s", redisMsgStr)
+
+	err = RedisCli.Publish(define.REDIS_SUB_CHANNEL, redisMsgStr).Err()
 	return
 }
-
-
-
-
-
-
-

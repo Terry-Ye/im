@@ -99,6 +99,7 @@ func (s *Server) readPump(ch *Channel) {
 		// rpc 操作获取uid 存入ch 存入Server 未写
 
 		// b.broadcast <- message
+		log.Infof("connArg roomId : %d", connArg.RoomId)
 		err = b.Put(uid, connArg.RoomId, ch)
 		if err != nil {
 			log.Errorf("conn close err: %s", err)

@@ -19,7 +19,7 @@ func init() {
 
 type Config struct {
 	Base      BaseConf  `mapstructure:"base"`
-	CometConf CometConf `mapstructure:"cometsAddrs"`
+	CometConf []CometConf `mapstructure:"cometsAddrs"`
 	// Bucket BucketConf `mapstructure:"bucket"`
 }
 
@@ -34,7 +34,8 @@ type BaseConf struct {
 	RedisDefaultDB int    `mapstructure:"redisDefaultDB"`
 }
 type CometConf struct {
-	Addrs map[string]string `mapstructure:"addr"` // rpc comet层的配置
+	Key int8 `mapstructure:"key"`
+	Addr string `mapstructure:"addr"`
 }
 
 func InitConfig() (err error) {
@@ -46,7 +47,7 @@ func InitConfig() (err error) {
 	if err := viper.ReadInConfig(); err != nil {
 		return err
 	}
-
+	// log.Infof("conf %v", Conf)
 	if err := viper.Unmarshal(&Conf); err != nil {
 		panic(fmt.Errorf("unable to decode into struct：  %s \n", err))
 	}
@@ -60,14 +61,15 @@ func NewConfig() *Config {
 			Pidfile:    "/tmp/job.pid",
 			MaxProc:    runtime.NumCPU(),
 			PprofAddrs: []string{"localhost:6922"},
-
 			RedisAddr:      "127.0.0.1:6379",
 			RedisPw:        "",
 			RedisDefaultDB: 0,
 		},
-		CometConf: CometConf{
-			Addrs: make(map[string]string),
+		CometConf: []CometConf{
+			{Key:1,Addr:"tcp@0.0.0.0:6912"},
+			{Key:2,Addr:"tcp@0.0.0.0:6913"},
 		},
+
 	}
 }
 
