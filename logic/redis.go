@@ -27,7 +27,7 @@ func InitRedis() (err error) {
 
 // 发布订阅消息
 func RedisPublishCh(serverId int8, uid string, msg []byte) (err error) {
-	var redisMsg = &proto.RedisMsg{Op: define.REDIS_MESSAGE_BROADCAST, ServerId: serverId, UserId: uid, Msg: msg}
+	var redisMsg = &proto.RedisMsg{Op: define.REDIS_MESSAGE_SINGLE, ServerId: serverId, UserId: uid, Msg: msg}
 
 	redisMsgStr, err := json.Marshal(redisMsg)
 

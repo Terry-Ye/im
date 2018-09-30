@@ -33,7 +33,7 @@ func createServer(network string, addr string) {
 }
 
 
-func (rpc *PushRpc) PushMsg(ctx context.Context, args *proto.PushMsgArg, noReply *proto.NoReply) (err error) {
+func (rpc *PushRpc) MPushMsg(ctx context.Context, args *proto.PushMsgArg, noReply *proto.NoReply) (err error) {
 
 	log.Info("rpc PushMsg :%v ", args)
 	if args == nil {
@@ -43,3 +43,21 @@ func (rpc *PushRpc) PushMsg(ctx context.Context, args *proto.PushMsgArg, noReply
 
 	return
 }
+
+func (rpc *PushRpc) PushSingleMsg(ctx context.Context, args *proto.PushMsgArg, noReply *proto.NoReply) (err error) {
+
+	log.Info("rpc PushMsg :%v ", args)
+	if args == nil {
+		log.Errorf("rpc PushRpc() error(%v)", err)
+		return
+	}
+
+	return
+}
+
+
+
+
+
+
+

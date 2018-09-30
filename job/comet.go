@@ -3,7 +3,8 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 	"im/libs/define"
-
+	"im/libs/proto"
+	"context"
 	"github.com/smallnest/rpcx/client"
 )
 
@@ -11,7 +12,10 @@ type CometRpc int
 
 var (
 	logicRpcClient client.XClient
+	RpcClientList map[int8]client.XClient
+
 )
+
 
 func InitComets(cometConf []CometConf) (err error)  {
 	log.Infof("len : %d ", len(cometConf))
@@ -25,13 +29,30 @@ func InitComets(cometConf []CometConf) (err error)  {
 		b.Key = bind.Addr
 		// 需要转int 类型
 		LogicAddrs[i] = b
+		d := client.NewPeer2PeerDiscovery(bind.Addr, "")
 
+		RpcClientList[bind.Key] = client.NewXClient(define.RPC_LOGIC_SERVER_PATH, client.Failtry, client.RandomSelect, d, client.DefaultOption)
+		defer RpcClientList[bind.Key].Close()
 	}
-	log.Infof("LogicAddrs %v", LogicAddrs)
-	d := client.NewMultipleServersDiscovery(LogicAddrs)
 
-	logicRpcClient = client.NewXClient(define.RPC_LOGIC_SERVER_PATH, client.Failover, client.RoundRobin, d, client.DefaultOption)
-	log.Infof("comet InitLogicRpc Server : %v ", logicRpcClient)
+	// servers
+	log.Infof("comet InitLogicRpc Server : %v ", RpcClientList)
+
 	return
+}
+
+func PushSingleToComet(serverId int8, userId string, msg []byte) {
+
+	pushMsgArg := &proto.PushMsgArg{Uid:userId, P:proto.Proto{Ver:1, Operation:define.REDIS_MESSAGE_SINGLE,Body:msg}}
+
+	RpcClientList[serverId].Call(context.Background(), "pushSingle", pushMsgArg, proto.NoReply{})
+
+
+
+
 
 }
+
+
+
+

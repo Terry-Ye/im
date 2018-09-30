@@ -33,6 +33,9 @@ func main() {
 		log.Panic(fmt.Errorf("InitRPC() fatal error : %s \n", err))
 	}
 
+	InitPush();
+
+
 
 	// log.Info("111 noteworthy happened!")
 

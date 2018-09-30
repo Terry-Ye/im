@@ -4,7 +4,8 @@ pidfile = "/tmp/job.pid"
 redisAddr = "localhost:6379"
 redisPw = ""
 RPCAddrs = "tcp@localhost:6923"
-
+pushChan = 2
+pushChanSize = 50
 
 
 [[cometsAddrs]]
