@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"im/libs/proto"
 	"math/rand"
+	"github.com/smallnest/rpcx/log"
 )
 
 type pushArg struct {
@@ -39,7 +40,7 @@ func push(msg string) (err error) {
 	m := &proto.RedisMsg{}
 	msgStr := []byte(msg)
 	if err := json.Unmarshal(msgStr, m); err != nil {
-		return
+		log.Infof(" json.Unmarshal err:%v ", err)
 	}
 	switch m.Op {
 	case define.REDIS_MESSAGE_SINGLE:

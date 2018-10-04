@@ -55,14 +55,17 @@ func main() {
 
 	// log.Infof("server %v", DefaultServer)
 	// log.Panicf("buckets :%v", buckets)
-
+	log.Info("start InitPushRpc")
+	if err := InitPushRpc(Conf.RpcPushAdds); err != nil {
+		log.Fatal(err)
+	}
 	if err := InitWebsocket(Conf.Websocket.Bind); err != nil {
 		log.Fatal(err)
 	}
 
-	if err := InitPushRpc(Conf.RpcPushAdds); err != nil {
-		log.Fatal(err)
-	}
-	log.Infof("size2: %d", DefaultServer.Options.ReadBufferSize)
+
+
+
+
 
 }

@@ -82,6 +82,7 @@ func (s *Server) readPump(ch *Channel) {
 		var(
 			connArg *proto.ConnArg
 
+
 		)
 		log.Infof("message :%s", message)
 		if err := json.Unmarshal([]byte(message), &connArg); err != nil {
@@ -106,7 +107,7 @@ func (s *Server) readPump(ch *Channel) {
 			ch.conn.Close()
 		}
 		log.Infof("message  333 :%s", message)
-		ch.broadcast <- message
+		// ch.broadcast <- message
 
 	}
 }
@@ -133,14 +134,15 @@ func (s *Server) writePump(ch *Channel) {
 			if err != nil {
 				return
 			}
-			log.Printf("message :%v", message)
-			w.Write(message)
+			log.Printf("message write :%v", message)
+			w.Write(message.Body)
+
 			// Add queued chat messages to the current websocket message.
-			n := len(ch.broadcast)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-ch.broadcast)
-			}
+			// n := len(ch.broadcast)
+			// for i := 0; i < n; i++ {
+			// 	w.Write(newline)
+			// 	w.Write(<-ch.broadcast)
+			// }
 
 			if err := w.Close(); err != nil {
 				return

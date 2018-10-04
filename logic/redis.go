@@ -6,6 +6,7 @@ import (
 	"im/libs/define"
 	"im/libs/proto"
 	"encoding/json"
+	"bytes"
 )
 
 var (
@@ -28,11 +29,24 @@ func InitRedis() (err error) {
 // 发布订阅消息
 func RedisPublishCh(serverId int8, uid string, msg []byte) (err error) {
 	var redisMsg = &proto.RedisMsg{Op: define.REDIS_MESSAGE_SINGLE, ServerId: serverId, UserId: uid, Msg: msg}
-
+	// var redisMsg = &proto.RedisMsg{}
+	// json.Unmarshal(msg, redisMsg)
+	// redisMsg.ServerId = serverId
+	// redisMsg.UserId = uid
 	redisMsgStr, err := json.Marshal(redisMsg)
 
 	log.Infof("redisMsg info : %s", redisMsgStr)
 
 	err = RedisCli.Publish(define.REDIS_SUB_CHANNEL, redisMsgStr).Err()
 	return
+}
+
+func getAuthKey(auth string) (string){
+
+	var key bytes.Buffer
+	key.WriteString(define.REDIS_AUTH_PREFIX)
+	key.WriteString(auth)
+	return key.String()
+
+
 }

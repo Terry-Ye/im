@@ -47,7 +47,7 @@ func Push(w http.ResponseWriter, r *http.Request) {
 		auth      = r.URL.Query().Get("auth")
 		err       error
 		bodyBytes []byte
-		// body	string
+		body	string
 	)
 
 	if router, err = getRouter(auth); err != nil {
@@ -61,9 +61,10 @@ func Push(w http.ResponseWriter, r *http.Request) {
 	if bodyBytes, err = ioutil.ReadAll(r.Body); err != nil {
 		log.Errorf("get router error : %s", err)
 	}
-	// body = string(bodyBytes)
+	r.Body.Close()
+	body = string(bodyBytes)
 
-	// log.Infof("get bodyBytes : %s", body)
+	log.Infof("get bodyBytes : %s", body)
 
 	if err := RedisPublishCh(router.ServerId, router.UserId, bodyBytes); err != nil {
 		log.Errorf("redis Publish err: %s", err)

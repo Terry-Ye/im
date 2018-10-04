@@ -58,3 +58,10 @@ func (b *Bucket) Put(key string, rid int32, ch *Channel) (err error){
 	return
 }
 
+func (b *Bucket) Channel(key string)  (ch *Channel){
+	// 读操作的锁定和解锁
+	b.cLock.RLock()
+	ch = b.chs[key]
+	b.cLock.RUnlock()
+	return
+}

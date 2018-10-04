@@ -13,6 +13,7 @@ import (
 type PushRpc int
 
 func InitPushRpc(addrs []RpcPushAddrs) (err error){
+	log.Info("InitPushRpc")
 	var (
 		network, addr string
 	)
@@ -29,6 +30,7 @@ func InitPushRpc(addrs []RpcPushAddrs) (err error){
 func createServer(network string, addr string) {
 	s := server.NewServer()
 	s.RegisterName(define.RPC_PUSH_SERVER_PATH, new(PushRpc), "")
+	log.Infof("createServer addr %s", addr)
 	s.Serve(network, addr)
 }
 
@@ -45,12 +47,25 @@ func (rpc *PushRpc) MPushMsg(ctx context.Context, args *proto.PushMsgArg, noRepl
 }
 
 func (rpc *PushRpc) PushSingleMsg(ctx context.Context, args *proto.PushMsgArg, noReply *proto.NoReply) (err error) {
-
+	var(
+		bucket  *Bucket
+		channel *Channel
+	)
 	log.Info("rpc PushMsg :%v ", args)
 	if args == nil {
 		log.Errorf("rpc PushRpc() error(%v)", err)
 		return
 	}
+	bucket = DefaultServer.Bucket(args.Uid)
+	if channel = bucket.Channel(args.Uid); channel !=  nil {
+		err = channel.Push(&args.P)
+
+		log.Infof("DefaultServer Channel err nil : %v", )
+	}
+
+
+
+
 
 	return
 }
