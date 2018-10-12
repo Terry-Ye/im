@@ -22,15 +22,16 @@ func getRouter(auth string) (router *proto.Router, err error) {
 	log.Infof("userid %v", userInfo)
 
 
-	rid, err := strconv.ParseInt(userInfo["RoomId"], 10, 32)
-	if err != nil {
-		return
-	}
+	// rid, err := strconv.ParseInt(userInfo["RoomId"], 10, 32)
+	// if err != nil {
+	// 	return
+	// }
 	sid, err := strconv.ParseInt(userInfo["ServerId"], 10, 16)
 	if err != nil {
 		return
 	}
-	router = &proto.Router{ServerId: int8(sid), RoomId: int32(rid), UserId: userInfo["UserId"]}
+	// router = &proto.Router{ServerId: int8(sid), RoomId: int32(rid), UserId: userInfo["UserId"]}
+	router = &proto.Router{ServerId: int8(sid),  UserId: userInfo["UserId"]}
 	return
 
 }

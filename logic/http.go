@@ -21,6 +21,7 @@ func InitHTTP() (err error) {
 
 		httpServeMux := http.NewServeMux()
 		httpServeMux.HandleFunc("/api/v1/push", Push)
+		httpServeMux.HandleFunc("/api/v1/pushRoom", PushRoom)
 
 		if network, addr, err = inet.ParseNetwork(Conf.Base.HttpAddrs[i]); err!=nil {
 			log.Errorf("inet.ParseNetwork() error(%v)", err)
@@ -37,8 +38,34 @@ func InitHTTP() (err error) {
 	}
 	return
 }
+
+func PushRoom(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method Not Allowed", 405)
+	}
+	var (
+		auth      = r.URL.Query().Get("auth")
+		err       error
+		bodyBytes []byte
+		body	string
+	)
+
+	if router, err = getRouter(auth); err != nil {
+		log.Errorf("get router error : %s", err)
+		return
+	}
+
+	if bodyBytes, err = ioutil.ReadAll(r.Body); err != nil {
+		log.Errorf("get router error : %s", err)
+	}
+	defer r.Body.Close()
+	body = string(bodyBytes)
+	log.Infof("get bodyBytes : %s", body)
+	if err := RedisPublishRoom(router.RoomId, bodyBytes); err != nil {
+		log.Errorf("redis Publish room err: %s", err)
+	}
+}
 func Push(w http.ResponseWriter, r *http.Request) {
-	// log.Info("yes")
 	if r.Method != "POST" {
 		http.Error(w, "Method Not Allowed", 405)
 	}
@@ -61,9 +88,9 @@ func Push(w http.ResponseWriter, r *http.Request) {
 	if bodyBytes, err = ioutil.ReadAll(r.Body); err != nil {
 		log.Errorf("get router error : %s", err)
 	}
-	r.Body.Close()
-	body = string(bodyBytes)
 
+	defer r.Body.Close()
+	body = string(bodyBytes)
 	log.Infof("get bodyBytes : %s", body)
 
 	if err := RedisPublishCh(router.ServerId, router.UserId, bodyBytes); err != nil {

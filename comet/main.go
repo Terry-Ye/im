@@ -40,6 +40,8 @@ func main() {
 		Buckets[i] = NewBucket(BucketOptions{
 			ChannelSize: Conf.Bucket.Channel,
 			RoomSize:    Conf.Bucket.Room,
+			RoutineAmount: Conf.Bucket.RoutineAmount,
+			RoutineSize: Conf.Bucket.RoutineSize,
 		})
 	}
 	operator := new(DefaultOperator)

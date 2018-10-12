@@ -37,7 +37,15 @@ func RedisPublishCh(serverId int8, uid string, msg []byte) (err error) {
 
 	log.Infof("redisMsg info : %s", redisMsgStr)
 
-	err = RedisCli.Publish(define.REDIS_SUB_CHANNEL, redisMsgStr).Err()
+	err = RedisCli.Publish(define.REDIS_SUB, redisMsgStr).Err()
+	return
+}
+
+func RedisPublishRoom(rid int32, msg []byte) (err error) {
+	var redisMsg = &proto.RedisMsg{Op: define.REDIS_MESSAGE_ROOM,  RoomId: rid, Msg: msg}
+	redisMsgStr, err := json.Marshal(redisMsg)
+	log.Infof("redisMsg info : %s", redisMsgStr)
+	err = RedisCli.Publish(define.REDIS_SUB, redisMsgStr).Err()
 	return
 }
 

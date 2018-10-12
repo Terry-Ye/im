@@ -1,9 +1,5 @@
 package define
 
 const(
-	OP_SEND = int32(1)
-
-
-
-
+	NO_AUTH = "ABCDEF"
 )

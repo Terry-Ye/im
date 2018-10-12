@@ -46,11 +46,12 @@ func (rpc *PushRpc) MPushMsg(ctx context.Context, args *proto.PushMsgArg, noRepl
 	return
 }
 
-func (rpc *PushRpc) PushSingleMsg(ctx context.Context, args *proto.PushMsgArg, noReply *proto.NoReply) (err error) {
+func (rpc *PushRpc) PushSingleMsg(ctx context.Context, args *proto.PushMsgArg, SuccessReply *proto.SuccessReply) (err error) {
 	var(
 		bucket  *Bucket
 		channel *Channel
 	)
+
 	log.Info("rpc PushMsg :%v ", args)
 	if args == nil {
 		log.Errorf("rpc PushRpc() error(%v)", err)
@@ -60,18 +61,27 @@ func (rpc *PushRpc) PushSingleMsg(ctx context.Context, args *proto.PushMsgArg, n
 	if channel = bucket.Channel(args.Uid); channel !=  nil {
 		err = channel.Push(&args.P)
 
-		log.Infof("DefaultServer Channel err nil : %v", )
+		log.Infof("DefaultServer Channel err nil : %v", err)
+		return
 	}
 
-
-
-
-
+	SuccessReply.Code = define.SUCCESS_REPLY
+	SuccessReply.Msg = define.SUCCESS_REPLY_MSG
+	log.Infof("SuccessReply v :%v", SuccessReply)
 	return
 }
 
+func (rpc *PushRpc) PushRoomMsg(ctx context.Context, args *proto.RoomMsgArg, SuccessReply *proto.SuccessReply) (err error) {
 
+	SuccessReply.Code = define.SUCCESS_REPLY
+	SuccessReply.Msg = define.SUCCESS_REPLY_MSG
+	for _, bucket :=range DefaultServer.Buckets {
+		bucket.BroadcastRoom(args)
+		// room.next
 
+	}
+	return
+}
 
 
 

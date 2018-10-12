@@ -10,3 +10,8 @@ type RedisMsg struct {
 
 type NoReply struct {
 }
+
+type SuccessReply struct {
+	Code int `json:"code"`
+	Msg string `json:"msg"`
+}

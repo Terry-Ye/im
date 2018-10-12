@@ -2,6 +2,7 @@ package main
 
 import (
 	"sync"
+	"im/libs/proto"
 )
 
 type Room struct {
@@ -36,6 +37,13 @@ func (r *Room) Put(ch *Channel) (err error) {
 		err = ErrRoomDroped
 	}
 	return
+}
 
-
+func (r *Room) Push(p *proto.Proto) {
+	r.rlock.RLock()
+	for ch := r.next; ch != nil; ch = ch.Next{
+		ch.Push(p)
+	}
+	r.rlock.RUnlock()
+	return
 }

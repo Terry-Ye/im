@@ -8,5 +8,10 @@ type PushMsgArg struct {
 }
 
 
+type RoomMsgArg struct {
+	RoomId int32
+	P   Proto
+}
+
 
 

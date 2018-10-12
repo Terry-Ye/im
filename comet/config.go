@@ -56,6 +56,8 @@ type BucketConf struct {
 	Channel  int `mapstructure:"channel"`
 	Room     int `mapstructure:"room"`
 	SvrProto int `mapstructure:"svrProto"`
+	RoutineAmount uint64 `mapstructure:"routineAmount"`
+	RoutineSize int `mapstructure:"routineSize"`
 }
 
 type WebsocketConf struct {
@@ -99,6 +101,8 @@ func NewConfig() *Config {
 			Channel:  1024,
 			Room:     1024,
 			SvrProto: 80,
+			RoutineAmount: 32,
+			RoutineSize: 20,
 		},
 		Websocket: WebsocketConf{
 			Bind: ":7911",

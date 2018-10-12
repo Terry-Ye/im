@@ -38,7 +38,7 @@ func createServer(network string, addr string) {
 }
 
 func (rpc *LogicRpc) Connect(ctx context.Context, args *proto.ConnArg, reply *proto.ConnReply) (err error) {
-	log.Info("rpc logic 2  rpc uid ")
+
 
 	if args == nil {
 		log.Errorf("Connect() error(%v)", err)
@@ -46,6 +46,12 @@ func (rpc *LogicRpc) Connect(ctx context.Context, args *proto.ConnArg, reply *pr
 	}
 	key := getAuthKey(args.Auth)
 	reply.Uid = RedisCli.HGet(key, "UserId").Val()
+
+	if reply.Uid == "" {
+		reply.Uid = define.NO_AUTH
+	}
+
+
 
 	log.Infof("logic rpc uid:%s", reply.Uid)
 

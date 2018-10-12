@@ -22,9 +22,12 @@ addr = "tcp@0.0.0.0:6913"
 
 [bucket]
 
-num = "256"
-channel = "1024"
-room = "1024"
-svrProto = "80"
+num = 256
+channel = 1024
+room = 1024
+svrProto = 80
+routineAmount = 32
+routineSize = 20
+
 
 

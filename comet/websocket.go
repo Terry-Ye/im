@@ -77,13 +77,18 @@ func (s *Server) readPump(ch *Channel) {
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Errorf("readPump ReadMessage err:%v", err)
+				return
 			}
+		}
+		if message == nil {
+			return
 		}
 		var(
 			connArg *proto.ConnArg
 
 
 		)
+
 		log.Infof("message :%s", message)
 		if err := json.Unmarshal([]byte(message), &connArg); err != nil {
 			log.Errorf("message struct %b", connArg)
@@ -92,6 +97,11 @@ func (s *Server) readPump(ch *Channel) {
 		log.Infof("websocket uid:%s", uid)
 		if err != nil {
 			log.Errorf("s.operator.Connect error %s", err)
+			return
+		}
+		if uid == "" {
+			log.Error("Invalid Auth ,uid empty")
+			return
 		}
 
 

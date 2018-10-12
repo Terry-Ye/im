@@ -46,6 +46,9 @@ func push(msg string) (err error) {
 	case define.REDIS_MESSAGE_SINGLE:
 		pushChs[rand.Int()%Conf.Base.PushChan] <- &pushArg{ServerId: m.ServerId, UserId: m.UserId, Msg: m.Msg, RoomId: m.RoomId}
 		break
+	case define.REDIS_MESSAGE_ROOM:
+		broadcastRoomToComet(m.RoomId, m.Msg)
+
 
 	}
 	return

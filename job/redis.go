@@ -22,7 +22,7 @@ func InitRedis() (err error) {
 	}
 
 	go func() {
-		redisSub := RedisCli.Subscribe(define.REDIS_SUB_CHANNEL)
+		redisSub := RedisCli.Subscribe(define.REDIS_SUB)
 		ch := redisSub.Channel()
 		for {
 			msg, ok := <-ch
