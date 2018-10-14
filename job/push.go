@@ -48,7 +48,7 @@ func push(msg string) (err error) {
 		break
 	case define.REDIS_MESSAGE_ROOM:
 		broadcastRoomToComet(m.RoomId, m.Msg)
-
+		break;
 
 	}
 	return

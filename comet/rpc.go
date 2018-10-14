@@ -75,6 +75,7 @@ func (rpc *PushRpc) PushRoomMsg(ctx context.Context, args *proto.RoomMsgArg, Suc
 
 	SuccessReply.Code = define.SUCCESS_REPLY
 	SuccessReply.Msg = define.SUCCESS_REPLY_MSG
+	log.Infof("PushRoomMsg msg %v", args)
 	for _, bucket :=range DefaultServer.Buckets {
 		bucket.BroadcastRoom(args)
 		// room.next

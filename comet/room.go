@@ -3,6 +3,7 @@ package main
 import (
 	"sync"
 	"im/libs/proto"
+	"github.com/smallnest/rpcx/log"
 )
 
 type Room struct {
@@ -42,8 +43,32 @@ func (r *Room) Put(ch *Channel) (err error) {
 func (r *Room) Push(p *proto.Proto) {
 	r.rlock.RLock()
 	for ch := r.next; ch != nil; ch = ch.Next{
+		log.Info("room push 11111111")
 		ch.Push(p)
 	}
+
+
 	r.rlock.RUnlock()
 	return
+}
+
+
+func (r *Room) Del(ch *Channel) bool {
+	r.rlock.RLock()
+	if ch.Next != nil {
+		//if not footer
+		ch.Next.Prev = ch.Prev
+	}
+
+	if ch.Prev != nil {
+		// if not header
+		ch.Prev.Next = ch.Next
+	}else {
+		r.next = ch.Next
+	}
+	r.Online--
+	r.drop = (r.Online == 0)
+	r.rlock.RUnlock()
+
+	return r.drop
 }

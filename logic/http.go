@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net"
 	"io/ioutil"
+	"strconv"
 )
 
 var (
@@ -45,23 +46,38 @@ func PushRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	var (
 		auth      = r.URL.Query().Get("auth")
+
 		err       error
 		bodyBytes []byte
 		body	string
 	)
 
+	// get roomId
+	rid, err := strconv.ParseInt(r.URL.Query().Get("rid"), 10, 32)
+	if err != nil {
+		log.Errorf("rid invalid : %s", rid)
+	}
+
+	// get auth info
 	if router, err = getRouter(auth); err != nil {
 		log.Errorf("get router error : %s", err)
 		return
 	}
 
+
+	if router.UserId == "" {
+		log.Error("userId invalid : ")
+		return
+	}
+
+	log.Errorf("get router error : %s", err)
 	if bodyBytes, err = ioutil.ReadAll(r.Body); err != nil {
 		log.Errorf("get router error : %s", err)
 	}
 	defer r.Body.Close()
 	body = string(bodyBytes)
-	log.Infof("get bodyBytes : %s", body)
-	if err := RedisPublishRoom(router.RoomId, bodyBytes); err != nil {
+	log.Infof("PushRoom get bodyBytes : %s", body)
+	if err := RedisPublishRoom(int32(rid), bodyBytes); err != nil {
 		log.Errorf("redis Publish room err: %s", err)
 	}
 }

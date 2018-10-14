@@ -12,6 +12,3 @@ pushChanSize = 50
 key = 1
 addr = "tcp@0.0.0.0:6912"
 
-[[cometsAddrs]]
-key = 2
-addr = "tcp@0.0.0.0:6913"

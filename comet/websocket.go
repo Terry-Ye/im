@@ -62,7 +62,10 @@ func serveWs(server *Server, w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) readPump(ch *Channel) {
 	defer func() {
+
+		s.Bucket(ch.uid).delCh(ch)
 		ch.conn.Close()
+
 	}()
 
 	ch.conn.SetReadLimit(s.Options.MaxMessageSize)
