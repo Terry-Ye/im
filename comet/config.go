@@ -87,7 +87,7 @@ func NewConfig() *Config {
 			Pidfile:         "/tmp/comet.pid",
 			Logfile:         "/Users/AT/go/src/im/logs/comet/comet.log",
 			MaxProc:         runtime.NumCPU(),
-			PprofBind:       []string{"localhost:7911"},
+			PprofBind:       []string{"localhost:6911"},
 			WriteWait:       10 * time.Second,
 			PongWait:        60 * time.Second,
 			PingPeriod:      54 * time.Second,

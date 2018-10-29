@@ -44,9 +44,9 @@ func (rpc *LogicRpc) Connect(ctx context.Context, args *proto.ConnArg, reply *pr
 		log.Errorf("Connect() error(%v)", err)
 		return
 	}
-	key := getAuthKey(args.Auth)
-	reply.Uid = RedisCli.HGet(key, "UserId").Val()
-
+	// key := getAuthKey(args.Auth)
+	// reply.Uid = RedisCli.HGet(key, "UserId").Val()
+	reply.Uid = args.Auth
 	if reply.Uid == "" {
 		reply.Uid = define.NO_AUTH
 	}

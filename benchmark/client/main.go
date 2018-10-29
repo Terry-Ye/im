@@ -1,48 +1,141 @@
 package main
 
-import (
-	"net/http"
+// Start Commond eg: ./client 1 5000 localhost:8080
+// first parameter：beginning userId
+// second parameter: amount of clients
+// third parameter: comet server ip
 
-	"github.com/gorilla/websocket"
-	log "github.com/sirupsen/logrus"
+import (
+	"bufio"
+	"encoding/binary"
+	"flag"
+	"fmt"
+	//mrand "math/rand"
+	"net"
+	"os"
+	"runtime"
+	"strconv"
+	"sync/atomic"
 	"time"
-	"im/libs/proto"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/gorilla/websocket"
+	"net/http"
 	"encoding/json"
+	"os/signal"
+	"net/url"
 )
+
+const (
+	OP_HANDSHARE        = int32(0)
+	OP_HANDSHARE_REPLY  = int32(1)
+	OP_HEARTBEAT        = int32(2)
+	OP_HEARTBEAT_REPLY  = int32(3)
+	OP_SEND_SMS         = int32(4)
+	OP_SEND_SMS_REPLY   = int32(5)
+	OP_DISCONNECT_REPLY = int32(6)
+	OP_AUTH             = int32(7)
+	OP_AUTH_REPLY       = int32(8)
+	OP_TEST             = int32(254)
+	OP_TEST_REPLY       = int32(255)
+)
+
+const (
+	rawHeaderLen = uint16(16)
+	heart        = 240 * time.Second //s
+)
+
+const (
+	// Time allowed to write a message to the peer.
+	writeWait = 10 * time.Second
+
+	// Time allowed to read the next pong message from the peer.
+	pongWait = 60 * time.Second
+
+	// Send pings to peer with this period. Must be less than pongWait.
+	pingPeriod = (pongWait * 9) / 10
+
+	// Maximum message size allowed from peer.
+	maxMessageSize = 512
+)
+
+type Proto struct {
+	Ver       int16           `json:"ver"`  // protocol version
+	Operation string           `json:"op"`   // operation for request
+	// SeqId     int32           `json:"seq"`  // sequence number chosen by client
+	Body      json.RawMessage `json:"body"` // binary body bytes(json.RawMessage is []byte)
+}
 
 var (
-	newline = []byte{'\n'}
-	space   = []byte{' '}
+	countDown int64
 )
 
-func serveHome(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL)
-	if r.URL.Path != "/" {
-		http.Error(w, "Not found", http.StatusNotFound)
-		return
+func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	flag.Parse()
+
+	begin, err := strconv.Atoi(os.Args[1])
+	if err != nil {
+		panic(err)
 	}
-	if r.Method != "GET" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
+
+	num, err := strconv.Atoi(os.Args[2])
+	if err != nil {
+		panic(err)
 	}
-	http.ServeFile(w, r, "home.html")
+
+	go result()
+
+	for i := begin; i < begin+num; i++ {
+		go client(fmt.Sprintf("%d", i))
+	}
+
+	var exit chan bool
+	<-exit
 }
 
-func InitWebsocket(bind string) (err error) {
-	http.HandleFunc("/", serveHome)
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(DefaultServer, w, r)
-	})
+func result() {
+	var (
+		lastTimes int64
+		diff      int64
+		nowCount  int64
+		timer     = int64(30)
+	)
 
-	err = http.ListenAndServe(bind, nil)
-	return err
+	for {
+		nowCount = atomic.LoadInt64(&countDown)
+		diff = nowCount - lastTimes
+		lastTimes = nowCount
+		fmt.Println(fmt.Sprintf("%s down:%d down/s:%d", time.Now().Format("2006-01-02 15:04:05"), nowCount, diff/timer))
+		time.Sleep(time.Duration(timer) * time.Second)
+	}
 }
 
-// serveWs handles websocket requests from the peer.
-func serveWs(server *Server, w http.ResponseWriter, r *http.Request) {
+func client(key string) {
+	for {
+		startClient(key)
+		time.Sleep(3 * time.Second)
+	}
+}
+
+
+
+
+func startClient(key string) {
+	//time.Sleep(time.Duration(mrand.Intn(30)) * time.Second)
+	quit := make(chan bool, 1)
+	defer close(quit)
+	var (
+		w http.ResponseWriter
+		r *http.Request
+	)
+
+
+
 	var upgrader = websocket.Upgrader{
-		ReadBufferSize:  DefaultServer.Options.ReadBufferSize,
-		WriteBufferSize: DefaultServer.Options.WriteBufferSize,
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
 	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -51,16 +144,23 @@ func serveWs(server *Server, w http.ResponseWriter, r *http.Request) {
 		log.Error(err)
 		return
 	}
+
 	var ch *Channel
 	// 写入配置
 	ch = NewChannel(server.Options.BroadcastSize)
 	ch.conn = conn
 
-	go server.writePump(ch)
-	go server.readPump(ch)
+	go writePump(ch)
+	go readPump(ch)
+
+
+
+
+
 }
 
-func (s *Server) readPump(ch *Channel) {
+
+func readPumpvb(ch *Channel) {
 	defer func() {
 
 		s.Bucket(ch.uid).delCh(ch)
@@ -125,12 +225,12 @@ func (s *Server) readPump(ch *Channel) {
 	}
 }
 
-func (s *Server) writePump(ch *Channel) {
+
+func writePump(ch *Channel) {
 	ticker := time.NewTicker(s.Options.PingPeriod)
 	log.Printf("ticker :%v", ticker)
 
 	defer func() {
-		s.Bucket(ch.uid).delCh(ch)
 		ticker.Stop()
 		ch.conn.Close()
 	}()
@@ -171,3 +271,6 @@ func (s *Server) writePump(ch *Channel) {
 		}
 	}
 }
+
+
+

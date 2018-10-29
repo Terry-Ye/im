@@ -93,11 +93,13 @@ func Push(w http.ResponseWriter, r *http.Request) {
 		body	string
 	)
 
-	if router, err = getRouter(auth); err != nil {
-
-		log.Errorf("get router error : %s", err)
-		return
-	}
+	// if router, err = getRouter(auth); err != nil {
+	//
+	// 	log.Errorf("get router error : %s", err)
+	// 	return
+	// }
+	// test
+	router = &proto.Router{ServerId: 1,  UserId: auth}
 
 	log.Infof("router info %v", router)
 
