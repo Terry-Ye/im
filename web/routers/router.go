@@ -9,6 +9,8 @@ package routers
 
 import (
 	"github.com/astaxie/beego"
+	"im/web/controllers/user"
+
 	"im/web/controllers"
 )
 
@@ -21,7 +23,7 @@ func init() {
 		),
 		beego.NSNamespace("/user",
 			beego.NSInclude(
-				&controllers.UserController{},
+				&user.UserController{},
 			),
 		),
 

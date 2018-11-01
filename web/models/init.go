@@ -30,7 +30,7 @@ func init() {
 
 
 	orm.RegisterDataBase("default", "mysql", getDbStr(UserModel.USER_DB), 30)
-	orm.RegisterModelWithPrefix("tb", new(UserModel.User))
+	orm.RegisterModelWithPrefix("tb_", new(UserModel.User))
 	// orm.RegisterModel(new(UserModel.User))
 
 }

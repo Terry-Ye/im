@@ -47,36 +47,4 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
-	beego.GlobalControllerRouter["im/web/controllers:UserController"] = append(beego.GlobalControllerRouter["im/web/controllers:UserController"],
-		beego.ControllerComments{
-			Method: "GetAll",
-			Router: `/`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["im/web/controllers:UserController"] = append(beego.GlobalControllerRouter["im/web/controllers:UserController"],
-		beego.ControllerComments{
-			Method: "Login",
-			Router: `/login`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["im/web/controllers:UserController"] = append(beego.GlobalControllerRouter["im/web/controllers:UserController"],
-		beego.ControllerComments{
-			Method: "Logout",
-			Router: `/logout`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["im/web/controllers:UserController"] = append(beego.GlobalControllerRouter["im/web/controllers:UserController"],
-		beego.ControllerComments{
-			Method: "Register",
-			Router: `/register`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams: param.Make(),
-			Params: nil})
-
 }
