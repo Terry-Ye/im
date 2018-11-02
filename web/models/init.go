@@ -6,7 +6,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"strings"
-	"im/web/models/UserModel"
+	"im/web/models/userModel"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -29,8 +29,8 @@ func init() {
 	confDbStr = userStr+":"+ password +"@(" + host + ":" + port + ")/{{DB_NAME}}?charset=utf8"
 
 
-	orm.RegisterDataBase("default", "mysql", getDbStr(UserModel.USER_DB), 30)
-	orm.RegisterModelWithPrefix("tb_", new(UserModel.User))
+	orm.RegisterDataBase("default", "mysql", getDbStr(userModel.USER_DB), 30)
+	orm.RegisterModelWithPrefix("tb_", new(userModel.User))
 	// orm.RegisterModel(new(UserModel.User))
 
 }

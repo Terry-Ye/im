@@ -3,21 +3,24 @@ package user
 import (
 	"im/web/models/userModel"
 	"im/web/module/util"
+	"im/web/controllers"
 	"encoding/json"
-
+	"im/web/logic/userLogic"
+	"github.com/astaxie/beego/validation"
 	"github.com/astaxie/beego"
 )
 
 // Operations about Users
 type UserController struct {
-	beego.Controller
+	controllers.BaseController
 }
 
-type User struct {
-	Username   string `valid:"Required;MinSize(3);MaxSize(32)"`
-	Password    int    `valid:"Required;MinSize(6);MaxSize(20)"`
-}
-
+// type User struct {
+// 	Id     string
+// 	Username   string `valid:"Required;MinSize(3);MaxSize(32)"`
+// 	Password    int    `valid:"Required;MinSize(6);MaxSize(20)"`
+// 	CreateTime int64
+// }
 
 
 // @Title Login
@@ -28,13 +31,16 @@ type User struct {
 // @Failure 403 user not exist
 // @router /login [get]
 func (u *UserController) Login() {
-	username := u.GetString("username")
-	password := u.GetString("password")
-	if userModel.Login(username, password) {
-		u.Data["json"] = "login success"
-	} else {
-		u.Data["json"] = "user not exist"
-	}
+	var (
+		user userModel.User
+	)
+	json.Unmarshal(u.Ctx.Input.RequestBody, &user)
+	// userInfo := userModel.GetUserInfoByUserName(user.UserName)
+
+
+
+
+
 	u.ServeJSON()
 }
 
@@ -46,15 +52,38 @@ func (u *UserController) Login() {
 // @Failure 403 user not exist
 // @router /register [post]
 func (u *UserController) Register() {
-
-	var user userModel.User
-
+	var (
+		user userModel.User
+	)
+	valid := validation.Validation{}
 	json.Unmarshal(u.Ctx.Input.RequestBody, &user)
 
+
+
+	b, err := valid.Valid(&user)
+	if err != nil {
+		beego.Debug("valid err %v", err)
+		return
+	}
+	if !b {
+		// validation does not pass
+		// blabla...
+		for _, err := range valid.Errors {
+			beego.Debug("err %v", err.Key)
+			// log.Println(err.Key, err.Message)
+		}
+	}
+
+	code, msg  := userLogic.CheckUserName(user.UserName)
+	if code != 0 {
+		u.Data["json"] = u.RenderDataSimple(code, msg)
+		u.ServeJSON()
+		return
+	}
 	user.Id = util.GenUuid()
-	beego.Debug("user info %v", user)
-	UserModel.AddOne(user)
-	return
+	code, msg  = userModel.AddOne(user)
+	u.Data["json"] = u.RenderDataSimple(code, msg)
+	u.ServeJSON()
 }
 
 // @Title logout

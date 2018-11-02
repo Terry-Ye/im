@@ -4,6 +4,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"time"
 	"github.com/astaxie/beego"
+	"im/web/define"
 )
 
 
@@ -15,10 +16,9 @@ func init() {
 
 type User struct {
 	Id       string `orm:"pk"`
-	UserName string
-	Password string
-	CreateTime int64
-
+	UserName string `valid:"Required;MinSize(3);MaxSize(32)"`
+	Password string `valid:"Required;MinSize(6);MaxSize(20)"`
+	CreateTime int64 `data:"CreateTime"`
 }
 
 func Login(username, password string) bool {
@@ -46,20 +46,33 @@ func CheckoutUserNameExist(userName string) bool {
 }
 
 
-func AddOne(user User) (aa int64){
+func GetUserInfoByUserName(userName string) (user User) {
+	o := orm.NewOrm()
+	o.Using("default") // 默认使用 default，你可以指定为其他数据库
+	user = User{UserName: userName}
+	err := o.Read(&user, "UserName")
+	if err == orm.ErrNoRows {
+		return User{}
+	}
+	return user
+}
+
+func AddOne(user User) (code int, msg string){
 	o := orm.NewOrm()
 	o.Using("default") // 默认使用 default，你可以指定为其他数据库
 
 	user.CreateTime  = time.Now().Unix()
-	beego.Debug("user %v", user)
-	aa, err := o.Insert(&user)
+
+	_, err := o.Insert(&user)
 	if err != nil  {
-		beego.Error("insert err :%v", err)
+		code = define.ERR_MYSQL_EXCEPTION_CODE
+		msg = define.ERR_MYSQL_EXCEPTION_MSG
+		beego.Error("mysql insert err :%v", err)
+		return
 	}
-	beego.Debug("insert %v", aa)
-	return aa
-
-
+	code = define.SUCCESS_CODE
+	msg = define.SUCCESS_MSG
+	return
 }
 
 
