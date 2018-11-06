@@ -4,7 +4,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"time"
 	"github.com/astaxie/beego"
-	"im/web/define"
+	"im/web/libs/define"
 )
 
 
@@ -16,7 +16,7 @@ func init() {
 
 type User struct {
 	Id       string `orm:"pk"`
-	UserName string `valid:"Required;MinSize(3);MaxSize(32)"`
+	UserName string `valid:"Required;MinSize(3);MaxSize(20)"`
 	Password string `valid:"Required;MinSize(6);MaxSize(20)"`
 	CreateTime int64 `data:"CreateTime"`
 }
@@ -62,7 +62,6 @@ func AddOne(user User) (code int, msg string){
 	o.Using("default") // 默认使用 default，你可以指定为其他数据库
 
 	user.CreateTime  = time.Now().Unix()
-
 	_, err := o.Insert(&user)
 	if err != nil  {
 		code = define.ERR_MYSQL_EXCEPTION_CODE

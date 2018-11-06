@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/validation"
+	"im/web/libs/define"
 )
 
 type DataNil struct {
@@ -34,5 +36,25 @@ func (c *BaseController) RenderDataSimple(code int, msg string) (retData RetData
 	retData.Data = DataNil{}
 	return
 
+}
+
+func (c *BaseController) CheckParams(dataModel interface{}) (code int, msg string){
+	// beego.Error("dataModel Valid err : %v", dataModel)
+	valid := validation.Validation{}
+	b, err := valid.Valid(dataModel)
+	if err != nil {
+		code = define.ERR_SYSTEM_EXCEPTION_CODE
+		msg = define.ERR_SYSTEM_EXCEPTION_MSG
+		beego.Error("Register Valid err : %v", err)
+		return
+	}
+	if !b {
+		for _, err := range valid.Errors {
+			code = define.ERR_PARAM_VAILD_CODE
+			msg = err.Key+ ":" + err.Message
+			return
+		}
+	}
+	return
 }
 

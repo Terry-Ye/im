@@ -6,6 +6,8 @@ import (
 	"github.com/satori/go.uuid"
 	"strings"
 	"encoding/json"
+	"fmt"
+	"crypto/md5"
 )
 
 func GenUuid() string {
@@ -23,4 +25,9 @@ func JsonDecode(jsonStr string, structModel interface{}) error {
 	decode := json.NewDecoder(strings.NewReader(jsonStr))
 	err := decode.Decode(structModel)
 	return err
+}
+
+func Md5(str string) string {
+	data := []byte(str)
+	return fmt.Sprintf("%x", md5.Sum(data))
 }
