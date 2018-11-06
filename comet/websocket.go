@@ -25,7 +25,10 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	http.ServeFile(w, r, "home.html")
+	http.HandleFunc("/demo/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "../demo/demo.html")
+	})
+
 }
 
 func InitWebsocket(bind string) (err error) {
