@@ -7,18 +7,21 @@ import (
 	"im/web/libs/define"
 )
 
-
-const USER_DB  = "test"
+const USER_DB = "test"
 
 func init() {
 
 }
 
 type User struct {
-	Id       string `orm:"pk"`
-	UserName string `valid:"Required;MinSize(3);MaxSize(20)"`
-	Password string `valid:"Required;MinSize(6);MaxSize(20)"`
-	CreateTime int64 `data:"CreateTime"`
+	Id         string `orm:"pk"`
+	UserName   string `valid:"Required;MinSize(3);MaxSize(20)"`
+	Password   string `valid:"Required;MinSize(6);MaxSize(20)"`
+	CreateTime int64  `data:"CreateTime"`
+}
+
+type Auth struct {
+	Auth string `valid:"Required;MinSize(3);MaxSize(20)"`
 }
 
 func Login(username, password string) bool {
@@ -26,13 +29,12 @@ func Login(username, password string) bool {
 	return false
 }
 
-func GetOne(userId string) (User *User, err error)  {
+func GetOne(userId string) (User *User, err error) {
 	o := orm.NewOrm()
 	o.Using("default") // 默认使用 default，你可以指定为其他数据库
 
 	return
 }
-
 
 func CheckoutUserNameExist(userName string) bool {
 	o := orm.NewOrm()
@@ -45,7 +47,6 @@ func CheckoutUserNameExist(userName string) bool {
 	return false
 }
 
-
 func GetUserInfoByUserName(userName string) (user User) {
 	o := orm.NewOrm()
 	o.Using("default") // 默认使用 default，你可以指定为其他数据库
@@ -57,13 +58,13 @@ func GetUserInfoByUserName(userName string) (user User) {
 	return user
 }
 
-func AddOne(user User) (code int, msg string){
+func AddOne(user User) (code int, msg string) {
 	o := orm.NewOrm()
 	o.Using("default") // 默认使用 default，你可以指定为其他数据库
 
-	user.CreateTime  = time.Now().Unix()
+	user.CreateTime = time.Now().Unix()
 	_, err := o.Insert(&user)
-	if err != nil  {
+	if err != nil {
 		code = define.ERR_MYSQL_EXCEPTION_CODE
 		msg = define.ERR_MYSQL_EXCEPTION_MSG
 		beego.Error("mysql insert err :%v", err)
@@ -73,5 +74,3 @@ func AddOne(user User) (code int, msg string){
 	msg = define.SUCCESS_MSG
 	return
 }
-
-

@@ -16,7 +16,7 @@ var (
 )
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL)
+	log.Println(r.URL.Path[1:])
 	if r.URL.Path != "/" {
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
@@ -26,7 +26,7 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.HandleFunc("/demo/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "../demo/demo.html")
+		http.ServeFile(w, r, "./demo/")
 	})
 
 }
@@ -43,10 +43,12 @@ func InitWebsocket(bind string) (err error) {
 
 // serveWs handles websocket requests from the peer.
 func serveWs(server *Server, w http.ResponseWriter, r *http.Request) {
+
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  DefaultServer.Options.ReadBufferSize,
 		WriteBufferSize: DefaultServer.Options.WriteBufferSize,
 	}
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 
@@ -89,10 +91,8 @@ func (s *Server) readPump(ch *Channel) {
 		if message == nil {
 			return
 		}
-		var(
+		var (
 			connArg *proto.ConnArg
-
-
 		)
 
 		log.Infof("message :%s", message)
@@ -109,7 +109,6 @@ func (s *Server) readPump(ch *Channel) {
 			log.Error("Invalid Auth ,uid empty")
 			return
 		}
-
 
 		b := s.Bucket(uid)
 

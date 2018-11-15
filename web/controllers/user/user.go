@@ -19,7 +19,6 @@ type UserController struct {
 // 	CreateTime int64
 // }
 
-
 // @Title Login
 // @Description Logs user into the system
 // @Param	username		formData 	string	true		"The username for login"
@@ -29,12 +28,12 @@ type UserController struct {
 // @router /login [post]
 func (u *UserController) Login() {
 	var (
-		user userModel.User
+		user    userModel.User
 		retData userLogic.ReturnInfo
 	)
 	json.Unmarshal(u.Ctx.Input.RequestBody, &user)
 	// userInfo := userModel.GetUserInfoByUserName(user.UserName)
-	code, msg  := u.CheckParams(user)
+	code, msg := u.CheckParams(user)
 	if code != 0 {
 		u.Data["json"] = u.RenderDataSimple(code, msg)
 		u.ServeJSON()
@@ -47,6 +46,8 @@ func (u *UserController) Login() {
 		u.ServeJSON()
 		return
 	}
+
+	u.Ctx.SetCookie("auth", retData.Auth, 86400, "/",  "localhost", "", false)  // 设置cookie
 
 	u.Data["json"] = u.RenderData(code, msg, retData)
 	u.ServeJSON()
@@ -65,14 +66,14 @@ func (u *UserController) Register() {
 	)
 	json.Unmarshal(u.Ctx.Input.RequestBody, &user)
 
-	code, msg  := u.CheckParams(user)
+	code, msg := u.CheckParams(user)
 
 	if code != 0 {
 		u.Data["json"] = u.RenderDataSimple(code, msg)
 		u.ServeJSON()
 		return
 	}
-	code, msg  = userLogic.CheckUserName(user.UserName)
+	code, msg = userLogic.CheckUserName(user.UserName)
 	if code != 0 {
 		u.Data["json"] = u.RenderDataSimple(code, msg)
 		u.ServeJSON()
@@ -83,6 +84,32 @@ func (u *UserController) Register() {
 	u.ServeJSON()
 }
 
+// @Title CheckAuth
+// @Description Check Auth
+// @Param	Auth		formData 	string	true		"The Auth for CheckAuth"
+// @Success 200 {string} CheckAuth success
+// @Failure 403 user not exist
+// @router /check_auth [post]
+func (u *UserController) CheckAuth() {
+	var (
+		authInfo userModel.Auth
+	)
+	json.Unmarshal(u.Ctx.Input.RequestBody, &authInfo)
+	code, msg := u.CheckParams(authInfo)
+	if code != 0 {
+		u.Data["json"] = u.RenderDataSimple(code, msg)
+		u.ServeJSON()
+		return
+	}
+
+	code, msg = userLogic.CheckAuth(authInfo.Auth)
+
+	u.Data["json"] = u.RenderDataSimple(code, msg)
+	u.ServeJSON()
+	return
+
+}
+
 // @Title logout
 // @Description Logs out current logged in user session
 // @Success 200 {string} logout success
@@ -90,7 +117,3 @@ func (u *UserController) Register() {
 func (u *UserController) Logout() {
 
 }
-
-
-
-

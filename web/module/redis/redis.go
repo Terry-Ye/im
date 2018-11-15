@@ -42,16 +42,17 @@ func InitRedis() (err error) {
 
 
 func Get(key string) string{
-	return RedisCli.Get(GetKey(key)).String()
+	beego.Debug("redis get key %s", GetKey(key))
+	return RedisCli.Get(GetKey(key)).Val()
 }
 
 func Set(key string, val interface{}, expiration time.Duration) ( err error) {
-	beego.Debug("RedisCli %v", RedisCli)
 	err = RedisCli.Set(GetKey(key), val, expiration).Err()
 	return
 }
 
 func GetKey(key string) string {
+	beego.Debug("redis get Prefix %s",Prefix)
 	return Prefix + key
 }
 

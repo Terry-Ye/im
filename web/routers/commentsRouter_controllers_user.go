@@ -9,6 +9,14 @@ func init() {
 
 	beego.GlobalControllerRouter["im/web/controllers/user:UserController"] = append(beego.GlobalControllerRouter["im/web/controllers/user:UserController"],
 		beego.ControllerComments{
+			Method: "CheckAuth",
+			Router: `/check_auth`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["im/web/controllers/user:UserController"] = append(beego.GlobalControllerRouter["im/web/controllers/user:UserController"],
+		beego.ControllerComments{
 			Method: "Login",
 			Router: `/login`,
 			AllowHTTPMethods: []string{"post"},
