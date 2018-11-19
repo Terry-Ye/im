@@ -24,7 +24,7 @@ func InitHTTP() (err error) {
 		httpServeMux.HandleFunc("/api/v1/push", Push)
 		httpServeMux.HandleFunc("/api/v1/pushRoom", PushRoom)
 
-		if network, addr, err = inet.ParseNetwork(Conf.Base.HttpAddrs[i]); err!=nil {
+		if network, addr, err = inet.ParseNetwork(Conf.Base.HttpAddrs[i]); err != nil {
 			log.Errorf("inet.ParseNetwork() error(%v)", err)
 			return
 		}
@@ -32,9 +32,7 @@ func InitHTTP() (err error) {
 		log.Infof("start http listen:\"%s\"", Conf.Base.HttpAddrs[i])
 
 		go httpListen(httpServeMux, network, addr)
-		select {
-
-		}
+		select {}
 
 	}
 	return
@@ -45,11 +43,11 @@ func PushRoom(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", 405)
 	}
 	var (
-		auth      = r.URL.Query().Get("auth")
+		auth = r.URL.Query().Get("auth")
 
 		err       error
 		bodyBytes []byte
-		body	string
+		body      string
 	)
 
 	// get roomId
@@ -60,24 +58,24 @@ func PushRoom(w http.ResponseWriter, r *http.Request) {
 
 	// get auth info
 	if router, err = getRouter(auth); err != nil {
+		log.Debug("get router error debug : %s", err)
 		log.Errorf("get router error : %s", err)
 		return
 	}
-
 
 	if router.UserId == "" {
 		log.Error("userId invalid : ")
 		return
 	}
 
-	log.Errorf("get router error : %s", err)
+
 	if bodyBytes, err = ioutil.ReadAll(r.Body); err != nil {
 		log.Errorf("get router error : %s", err)
 	}
 	defer r.Body.Close()
 	body = string(bodyBytes)
 	log.Infof("PushRoom get bodyBytes : %s", body)
-	if err := RedisPublishRoom(int32(rid), bodyBytes); err != nil {
+	if err := RedisPublishRoom(int32(rid), bodyBytes, router.UserId); err != nil {
 		log.Errorf("redis Publish room err: %s", err)
 	}
 }
@@ -88,18 +86,17 @@ func Push(w http.ResponseWriter, r *http.Request) {
 
 	var (
 		auth      = r.URL.Query().Get("auth")
+		sendId     = r.URL.Query().Get("userId")
 		err       error
 		bodyBytes []byte
-		body	string
+		body      string
 	)
 
-	// if router, err = getRouter(auth); err != nil {
-	//
-	// 	log.Errorf("get router error : %s", err)
-	// 	return
-	// }
-	// test
-	router = &proto.Router{ServerId: 1,  UserId: auth}
+	if router, err = getRouter(auth); err != nil {
+
+		log.Errorf("get router error : %s", err)
+		return
+	}
 
 	log.Infof("router info %v", router)
 
@@ -111,11 +108,9 @@ func Push(w http.ResponseWriter, r *http.Request) {
 	body = string(bodyBytes)
 	log.Infof("get bodyBytes : %s", body)
 
-	if err := RedisPublishCh(router.ServerId, router.UserId, bodyBytes); err != nil {
+	if err := RedisPublishCh(router.ServerId, sendId, bodyBytes, router); err != nil {
 		log.Errorf("redis Publish err: %s", err)
 	}
-
-
 
 }
 

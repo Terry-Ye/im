@@ -16,18 +16,24 @@ func getRouter(auth string) (router *proto.Router, err error) {
 
 	log.Infof("key %s", key.String())
 	userInfo, err := RedisCli.HGetAll(key.String()).Result()
+
+
+	log.Infof("userInfo %v", userInfo)
+
 	if err != nil {
+		log.Infof("router err %v", err)
 		return
 	}
-	log.Infof("userid %v", userInfo)
+
 
 
 	// rid, err := strconv.ParseInt(userInfo["RoomId"], 10, 32)
 	// if err != nil {
 	// 	return
 	// }
-	sid, err := strconv.ParseInt(userInfo["ServerId"], 10, 16)
+	sid, err := strconv.ParseInt(userInfo["ServerId"], 10, 8)
 	if err != nil {
+		log.Infof("router err %v", err)
 		return
 	}
 	// router = &proto.Router{ServerId: int8(sid), RoomId: int32(rid), UserId: userInfo["UserId"]}

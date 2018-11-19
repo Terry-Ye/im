@@ -55,8 +55,15 @@ func PushSingleToComet(serverId int8, userId string, msg []byte)  {
 }
 
 
-func broadcastRoomToComet(RoomId int32, msg []byte) {
-	pushMsgArg := &proto.RoomMsgArg{RoomId:RoomId, P:proto.Proto{Ver:1, Operation:define.REDIS_MESSAGE_ROOM,Body:msg}}
+func broadcastRoomToComet(RoomId int32, msg []byte, FormUserId  string) {
+	pushMsgArg := &proto.RoomMsgArg{
+		RoomId:RoomId, P:proto.Proto{
+			Ver:1,
+			Operation:define.REDIS_MESSAGE_ROOM,
+			Body:msg,
+			FormUserId: FormUserId,
+		},
+	}
 	reply := &proto.SuccessReply{}
 	log.Infof("broadcastRoomToComet roomid %d", RoomId)
 	for _, rpc :=  range RpcClientList {

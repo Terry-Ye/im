@@ -39,11 +39,15 @@ func InitRedis() (err error) {
 }
 
 
-
-
 func Get(key string) string{
 	beego.Debug("redis get key %s", GetKey(key))
 	return RedisCli.Get(GetKey(key)).Val()
+}
+
+func HGet(key string, field string ) string{
+	// beego.Debug("redis get key %s", GetKey(key))
+	return RedisCli.HGet(GetKey(key), field).Val()
+
 }
 
 func Set(key string, val interface{}, expiration time.Duration) ( err error) {
@@ -54,6 +58,12 @@ func Set(key string, val interface{}, expiration time.Duration) ( err error) {
 func GetKey(key string) string {
 	beego.Debug("redis get Prefix %s",Prefix)
 	return Prefix + key
+}
+
+func HMSet(key string, mapData map[string]interface{}) (err error){
+	err = RedisCli.HMSet(GetKey(key), mapData).Err()
+	return
+
 }
 
 

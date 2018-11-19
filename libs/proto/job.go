@@ -6,6 +6,8 @@ type RedisMsg struct {
 	RoomId   int32  `json:"roomId,omitempty"`
 	UserId   string `json:"userId,omitempty"`
 	Msg      []byte `json:"msg"`
+	FormUserId string `json:"FormUserId"`
+	FormServerId int8 `json:"FormServerId"`
 }
 
 type NoReply struct {

@@ -25,10 +25,7 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	http.HandleFunc("/demo/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./demo/")
-	})
-
+	http.ServeFile(w, r, "home.html")
 }
 
 func InitWebsocket(bind string) (err error) {
@@ -99,6 +96,8 @@ func (s *Server) readPump(ch *Channel) {
 		if err := json.Unmarshal([]byte(message), &connArg); err != nil {
 			log.Errorf("message struct %b", connArg)
 		}
+		connArg.ServerId = Conf.Base.ServerId
+
 		uid, err := s.operator.Connect(connArg)
 		log.Infof("websocket uid:%s", uid)
 		if err != nil {

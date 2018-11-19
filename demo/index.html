@@ -86,7 +86,7 @@
     $(document).ready(function()
     {
         var auth = getCookie("auth")
-        alert(auth)
+
         var jsonData = {"Auth":auth}
 
         $.ajax({
@@ -117,8 +117,11 @@
         //调用websocket对象建立连接：
         //参数：ws/wss(加密)：//ip:port （字符串）
         var websocket = new WebSocket("ws://localhost:6911/ws");
+        var data = {"auth":getCookie("auth"),"roomId":1}
+
         //onopen监听连接打开
         websocket.onopen = function (evt) {
+            websocket.send(JSON.stringify(data))
             //websocket.readyState 属性：
             /*
             CONNECTING    0    The connection is not yet open.

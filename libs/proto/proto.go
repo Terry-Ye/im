@@ -7,4 +7,6 @@ type Proto struct {
 	Operation string           `json:"op"`   // operation for request
 	// SeqId     int32           `json:"seq"`  // sequence number chosen by client
 	Body      json.RawMessage `json:"body"` // binary body bytes(json.RawMessage is []byte)
+	FormUserId string `json:"formUserId"`  // formUserId
+
 }

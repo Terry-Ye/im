@@ -39,6 +39,7 @@ type RpcLogicAddrs struct {
 // 基础的配置信息
 type BaseConf struct {
 	Pidfile         string   `mapstructure:"pidfile"`
+	ServerId        int8   `mapstructure:"serverId"`
 	MaxProc         int
 	PprofBind       []string `mapstructure:"pprofBind"` // 性能监控的域名端口
 	Logfile         string   `mapstructure:"logfile"`   // log 文件

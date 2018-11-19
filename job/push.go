@@ -13,6 +13,8 @@ type pushArg struct {
 	UserId   string
 	Msg      []byte
 	RoomId   int32
+	FormUserId string
+	FormServerId int8
 }
 
 var pushChs []chan *pushArg
@@ -44,10 +46,17 @@ func push(msg string) (err error) {
 	}
 	switch m.Op {
 	case define.REDIS_MESSAGE_SINGLE:
-		pushChs[rand.Int()%Conf.Base.PushChan] <- &pushArg{ServerId: m.ServerId, UserId: m.UserId, Msg: m.Msg, RoomId: m.RoomId}
+		pushChs[rand.Int()%Conf.Base.PushChan] <- &pushArg{
+			ServerId: m.ServerId,
+			UserId: m.UserId,
+			Msg: m.Msg,
+			RoomId: m.RoomId,
+			FormUserId: m.FormUserId,
+			FormServerId: m.FormServerId,
+		}
 		break
 	case define.REDIS_MESSAGE_ROOM:
-		broadcastRoomToComet(m.RoomId, m.Msg)
+		broadcastRoomToComet(m.RoomId, m.Msg, m.FormUserId)
 		break;
 
 	}

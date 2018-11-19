@@ -1,7 +1,7 @@
 package define
 
 const(
-	REDIS_AUTH_PREFIX = "im_auth_"
+	REDIS_AUTH_PREFIX = "im_"
 	// REDIS_SUB_CHANNEL = "go_im_sub_channel"
 	REDIS_SUB = "go_im_sub"
 	REDIS_MESSAGE_BROADCAST = "redis_message_broadcast"

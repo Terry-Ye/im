@@ -27,12 +27,16 @@ func InitRedis() (err error) {
 }
 
 // 发布订阅消息
-func RedisPublishCh(serverId int8, uid string, msg []byte) (err error) {
-	var redisMsg = &proto.RedisMsg{Op: define.REDIS_MESSAGE_SINGLE, ServerId: serverId, UserId: uid, Msg: msg}
-	// var redisMsg = &proto.RedisMsg{}
-	// json.Unmarshal(msg, redisMsg)
-	// redisMsg.ServerId = serverId
-	// redisMsg.UserId = uid
+func RedisPublishCh(serverId int8, uid string, msg []byte, formUserInfo *proto.Router) (err error) {
+	var redisMsg = &proto.RedisMsg{
+		Op: define.REDIS_MESSAGE_SINGLE,
+		ServerId: serverId,
+		UserId: uid,
+		Msg: msg,
+		FormUserId: formUserInfo.UserId,
+		FormServerId: formUserInfo.ServerId,
+	}
+
 	redisMsgStr, err := json.Marshal(redisMsg)
 
 	log.Infof("redisMsg info : %s", redisMsgStr)
@@ -41,8 +45,13 @@ func RedisPublishCh(serverId int8, uid string, msg []byte) (err error) {
 	return
 }
 
-func RedisPublishRoom(rid int32, msg []byte) (err error) {
-	var redisMsg = &proto.RedisMsg{Op: define.REDIS_MESSAGE_ROOM,  RoomId: rid, Msg: msg}
+func RedisPublishRoom(rid int32, msg []byte, formUserId string) (err error) {
+	var redisMsg = &proto.RedisMsg{
+		Op: define.REDIS_MESSAGE_ROOM,
+		RoomId: rid,
+		Msg: msg,
+		FormUserId:formUserId,
+	}
 	redisMsgStr, err := json.Marshal(redisMsg)
 	log.Infof("redisMsg info : %s", redisMsgStr)
 	err = RedisCli.Publish(define.REDIS_SUB, redisMsgStr).Err()

@@ -1,6 +1,7 @@
 [base]
 pidfile = "/tmp/comet.pid"
 logfile = "/Users/AT/go/src/im/logs/comet/comet.log"
+serverId = 1
 
 [websocket]
 bind = "0.0.0.0:6911"
