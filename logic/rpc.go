@@ -8,6 +8,7 @@ import (
 	"im/libs/proto"
 
 	"im/libs/define"
+	"time"
 )
 
 type LogicRpc int
@@ -44,14 +45,24 @@ func (rpc *LogicRpc) Connect(ctx context.Context, args *proto.ConnArg, reply *pr
 		return
 	}
 
-	key := getAuthKey(args.Auth)
+	key := getKey(args.Auth)
+	log.Infof("logic rpc key:%s", key)
 	reply.Uid = RedisCli.HGet(key, "UserId").Val()
 
-	reply.Uid = args.Auth
 	if reply.Uid == "" {
 		reply.Uid = define.NO_AUTH
+	}else {
+		userKey := getKey(reply.Uid)
+
+		log.Infof("logic redis set uid serverId:%s, serverId : %s", userKey, args.ServerId)
+		validTime := define.REDIS_BASE_VALID_TIME * time.Second
+		err  = RedisCli.Set(userKey, args.ServerId,  validTime).Err()
+		if err != nil {
+			log.Infof("logic set err:%s", err)
+		}
 	}
-	RedisCli.HSet(key, "ServerId", args.ServerId)
+
+
 
 	log.Infof("logic rpc uid:%s", reply.Uid)
 

@@ -144,12 +144,13 @@ func (s *Server) writePump(ch *Channel) {
 				ch.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
-			log.Printf("TextMessage :%v", websocket.TextMessage)
+
 			w, err := ch.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
 				return
 			}
 			log.Printf("message write :%v", message)
+			log.Infof("message write body:%s", message.Body)
 			w.Write(message.Body)
 
 			// Add queued chat messages to the current websocket message.

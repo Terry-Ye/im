@@ -28,7 +28,6 @@ func (r *Room) Put(ch *Channel) (err error) {
 	if !r.drop {
 		if r.next != nil {
 			r.next.Prev = ch
-
 		}
 		ch.Next = r.next
 		ch.Prev = nil

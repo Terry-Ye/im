@@ -27,14 +27,12 @@ func InitRedis() (err error) {
 }
 
 // 发布订阅消息
-func RedisPublishCh(serverId int8, uid string, msg []byte, formUserInfo *proto.Router) (err error) {
+func RedisPublishCh(serverId int8, uid string, msg []byte) (err error) {
 	var redisMsg = &proto.RedisMsg{
-		Op: define.REDIS_MESSAGE_SINGLE,
+		Op: define.OP_SINGLE_SEND,
 		ServerId: serverId,
 		UserId: uid,
 		Msg: msg,
-		FormUserId: formUserInfo.UserId,
-		FormServerId: formUserInfo.ServerId,
 	}
 
 	redisMsgStr, err := json.Marshal(redisMsg)
@@ -45,12 +43,11 @@ func RedisPublishCh(serverId int8, uid string, msg []byte, formUserInfo *proto.R
 	return
 }
 
-func RedisPublishRoom(rid int32, msg []byte, formUserId string) (err error) {
+func RedisPublishRoom(rid int32, msg []byte) (err error) {
 	var redisMsg = &proto.RedisMsg{
-		Op: define.REDIS_MESSAGE_ROOM,
+		Op: define.OP_ROOM_SEND,
 		RoomId: rid,
 		Msg: msg,
-		FormUserId:formUserId,
 	}
 	redisMsgStr, err := json.Marshal(redisMsg)
 	log.Infof("redisMsg info : %s", redisMsgStr)
@@ -58,12 +55,12 @@ func RedisPublishRoom(rid int32, msg []byte, formUserId string) (err error) {
 	return
 }
 
-func getAuthKey(auth string) (string){
+func getKey(key string) (string){
 
-	var key bytes.Buffer
-	key.WriteString(define.REDIS_AUTH_PREFIX)
-	key.WriteString(auth)
-	return key.String()
+	var returnKey bytes.Buffer
+	returnKey.WriteString(define.REDIS_PREFIX)
+	returnKey.WriteString(key)
+	return returnKey.String()
 
 
 }

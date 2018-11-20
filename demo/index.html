@@ -47,17 +47,8 @@
                <li class="crt j-tab" data-value="mem"></li>
 
             </ul>
-            <div class="chat j-pannel j-chat">
+            <div class="chat j-pannel j-chat" id="msg">
 
-
-                <div class="item" data-id="548cf190740a460eea43af630a17090d">
-                    <p class="nick guest j-nick " data-role="guest" data-account="oqzw45cvvheebryvjifu8ido6fmm">无名</p>
-                    <p class="text">aaa</p>
-                </div>
-                <div class="item" data-id="bb3c69821b6f697f72489d921366963a">
-                    <p class="nick guest j-nick " data-role="guest" data-account="oqzw45cvvheebryvjifu8ido6fmm">无名</p>
-                    <p class="text">ddd</p>
-                </div>
             </div>
 
             <div id="chatroom-verified">
@@ -115,6 +106,7 @@
     });
     function websocket() {
         //调用websocket对象建立连接：
+        var msg            = document.getElementById("msg");
         //参数：ws/wss(加密)：//ip:port （字符串）
         var websocket = new WebSocket("ws://localhost:6911/ws");
         var data = {"auth":getCookie("auth"),"roomId":1}
@@ -137,7 +129,11 @@
         //    };
         //onmessage 监听服务器数据推送
         websocket.onmessage = function (evt) {
-            msg.innerHTML += evt.data +'<br>';
+            var data = JSON.parse(evt.data)
+
+            var innerInfo = '<div class="item" ><p class="nick guest j-nick " data-role="guest" data-account="oqzw45cvvheebryvjifu8ido6fmm">'+ data.formUserName +'</p><p class="text">' + data.msg +'</p></div>'
+            msg.innerHTML += innerInfo +'<br>';
+            // msg.innerHTML += evt.data +'<br>';
 
 //        console.log('Retrieved data from server: ' + evt.data);
         };
