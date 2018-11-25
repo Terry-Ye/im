@@ -10,12 +10,13 @@
         <div class="logo item">聊天室demo</div>
 
 
+
         <div class="info item">
             <img src="./static/9302457.jpeg" alt="头像" id="avatar">
             <!--a href="./roomManage.html" id="nickName">匿名</a-->
-            <span id="nickName">at</span>
-            <a href="#" id="chatroom-login" style="display: none;">登录</a>
-            <a id="chatroom-logout">注销</a>
+            <span id="nickName"></span>
+            <a href="http://localhost:1999/login.html" id="chatroom-login" style="display: none;">登录</a>
+            <a  id="chatroom-logout"  onclick="logout()">注销</a>
         </div>
 
     </div>
@@ -41,7 +42,7 @@
             <div class="announcement_title">
                 直播公告
             </div>
-            <div class="announcement" id="roomAnnouncement">暂无公告</div>
+            <div class="announcement" id="roomAnnouncement"><a href="https://github.com/Terry-Ye/im ">中文文档地址</a></div>
            <ul class="tab">
                 <li class="crt j-tab" data-value="chat">直播互动</li>
                <li class="crt j-tab" data-value="mem"></li>
@@ -56,42 +57,56 @@
                     <textarea class="editText" id="editText" placeholder=""></textarea>
                 </div>
                 <div class="sendBtn">
-                    <a class="u-btn btn" id="sentText">发送</a>
+                    <a class="u-btn btn" id="sentText" onclick="send()">发送</a>
                     <a class="btn custom" id="customBtn"></a>
                     <a class="btn emoji" id="emoji"></a>
                 </div>
             </div>
-            <div id="chatroom-anonymous" style="display: none;">
+            <div id="chatroom-anonymous" >
                 <em class="loginWarn">登录后方可发送消息</em>
                 <div class="loginBtn">
-                    <a href="#" class="u-btn btn">登录聊天室</a>
+                    <a href="http://localhost:1999/login.html" class="u-btn btn">登录聊天室</a>
                 </div>
             </div>
+
+
         </div>
     </div>
 </div>
+
 <script src="js/jquery.min.js?v=2.1.4"></script>
 <script type="text/javascript">
 
+    var websocket = new WebSocket("ws://localhost:6911/ws");
 
     $(document).ready(function()
     {
+        // 检查auth
         var auth = getCookie("auth")
-
         var jsonData = {"Auth":auth}
-
         $.ajax({
-            //几个参数需要注意一下
-            type: "POST",//方法类型
-            dataType: "json",//预期服务器返回的数据类型
-            url: "http://localhost:8080/v1/user/check_auth" ,//url
+            // 几个参数需要注意一下
+            type: "POST",// 方法类型
+            contentType: "application/json",
+            dataType: "json",// 预期服务器返回的数据类型
+            url: "http://localhost:8080/v1/user/check_auth" ,// url
             data:  JSON.stringify(jsonData) ,
             success: function (result) {
                 if (result.code == 0) {
-
+                    document.getElementById("chatroom-verified").style.display="block";
+                    document.getElementById("chatroom-anonymous").style.display = "none";
+                    $("#nickName").text(result.data.UserName);
+                    document.getElementById("nickName").style.display="inline";
+                    document.getElementById("chatroom-login").style.display="none";
+                    // chatroom-login
                 }else  {
-                    alert("请先简单注册登录")
-                    window.location.href="http://localhost:1999/register.html";
+                    document.getElementById("chatroom-verified").style.display="none";
+                    document.getElementById("chatroom-anonymous").style.display="block";
+                    document.getElementById("nickName").style.display="none";
+                    document.getElementById("chatroom-login").style.display="inline";
+                    document.getElementById("chatroom-logout").style.display="none";
+
+
                 }
 
             },
@@ -99,28 +114,16 @@
                 alert("异常！");
             }
         });
-        // l
-        websocket()
-
-
-    });
-    function websocket() {
+        // 连接websocket
         //调用websocket对象建立连接：
         var msg            = document.getElementById("msg");
         //参数：ws/wss(加密)：//ip:port （字符串）
-        var websocket = new WebSocket("ws://localhost:6911/ws");
+
         var data = {"auth":getCookie("auth"),"roomId":1}
 
         //onopen监听连接打开
         websocket.onopen = function (evt) {
             websocket.send(JSON.stringify(data))
-            //websocket.readyState 属性：
-            /*
-            CONNECTING    0    The connection is not yet open.
-            OPEN    1    The connection is open and ready to communicate.
-            CLOSING    2    The connection is in the process of closing.
-            CLOSED    3    The connection is closed or couldn't be opened.
-            */
 
         };
         //监听连接关闭
@@ -130,21 +133,35 @@
         //onmessage 监听服务器数据推送
         websocket.onmessage = function (evt) {
             var data = JSON.parse(evt.data)
-
             var innerInfo = '<div class="item" ><p class="nick guest j-nick " data-role="guest" data-account="oqzw45cvvheebryvjifu8ido6fmm">'+ data.formUserName +'</p><p class="text">' + data.msg +'</p></div>'
             msg.innerHTML += innerInfo +'<br>';
-            // msg.innerHTML += evt.data +'<br>';
-
-//        console.log('Retrieved data from server: ' + evt.data);
         };
-    }
+    });
 
 
-    function song(){
-        var text = document.getElementById('text').value;
-        document.getElementById('text').value = '';
-        //向服务器发送数据
-        websocket.send(text);
+
+    function send(){
+        var msg = document.getElementById('editText').value;
+        document.getElementById('editText').value = '';
+        var jsonData = {op: 3, msg:msg, rid: 1};
+        $.ajax({
+            // 几个参数需要注意一下
+            type: "POST",// 方法类型
+            dataType: "json",// 预期服务器返回的数据类型
+            url: "http://localhost:6921/api/v1/pushRoom?auth="+getCookie("auth")+"&rid=1" ,// url
+            data: JSON.stringify(jsonData),
+            success: function (result) {
+                if (result.code == 0) {
+
+                }else  {
+                    alert("请先简单注册登录")
+                    window.location.href="http://localhost:1999/register.html";
+                }
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
     }
 
     function getCookie(name)
@@ -158,6 +175,26 @@
             return null;
     }
 
+    function logout() {
+        $.ajax({
+            // 几个参数需要注意一下
+            type: "GET",// 方法类型
+            dataType: "json",// 预期服务器返回的数据类型
+            url: "http://localhost:8080/v1/user/logout?auth="+getCookie("auth") ,// url
+            // data: JSON.stringify(jsonData),
+            success: function (result) {
+                if (result.code == 0) {
+                    window.location.href="http://localhost:1999/login.html";
+                }else  {
+                    alert("请求出错，请稍后重试！")
+
+                }
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    }
 
     // var msg = document.getElementById("msg");
 

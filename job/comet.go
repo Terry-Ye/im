@@ -43,7 +43,7 @@ func InitComets(cometConf []CometConf) (err error)  {
 
 func PushSingleToComet(serverId int8, userId string, msg []byte)  {
 	log.Infof("PushSingleToComet Body %s", msg)
-	pushMsgArg := &proto.PushMsgArg{Uid:userId, P:proto.Proto{Ver:1, Operation:define.REDIS_MESSAGE_SINGLE,Body:msg}}
+	pushMsgArg := &proto.PushMsgArg{Uid:userId, P:proto.Proto{Ver:1, Operation:define.OP_SINGLE_SEND,Body:msg}}
 	// log.Infof("PushSingleToComet serverId %d", serverId)
 	// log.Infof("PushSingleToComet RpcClientList %v", RpcClientList[serverId])
 	reply := &proto.SuccessReply{}
@@ -59,7 +59,7 @@ func broadcastRoomToComet(RoomId int32, msg []byte) {
 	pushMsgArg := &proto.RoomMsgArg{
 		RoomId:RoomId, P:proto.Proto{
 			Ver:1,
-			Operation:define.REDIS_MESSAGE_ROOM,
+			Operation:define.OP_ROOM_SEND,
 			Body:msg,
 
 		},

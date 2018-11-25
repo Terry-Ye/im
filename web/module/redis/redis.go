@@ -50,9 +50,19 @@ func HGet(key string, field string ) string{
 
 }
 
+func HGetAll(key string) (map[string]string, error)  {
+	return RedisCli.HGetAll(GetKey(key)).Result()
+}
+
 func Set(key string, val interface{}, expiration time.Duration) ( err error) {
 	err = RedisCli.Set(GetKey(key), val, expiration).Err()
 	return
+}
+
+
+func Delete(key string) error {
+	return RedisCli.Del(GetKey(key)).Err()
+
 }
 
 func GetKey(key string) string {

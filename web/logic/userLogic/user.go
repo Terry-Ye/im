@@ -25,21 +25,25 @@ func CheckUserName(userName string) (code int, msg string) {
 	return
 }
 
-func CheckAuth(auth string) (code int, msg string) {
+func CheckAuth(auth string) (code int, msg string, ret ReturnInfo) {
 	// var user userModel.User
 
 	err := redis.InitRedis()
 	if err != nil {
 		beego.Error("redis init  err: %s", err)
 	}
-	userId := redis.HGet(auth, "UserId")
+	userInfo, err := redis.HGetAll(auth)
 
-	if userId == "" {
+	if err != nil {
 		beego.Debug("json err %s", err)
 		code = define.ERR_USER_NO_EXIST_CODE
 		msg = define.ERR_USER_NO_EXIST_MSG
 		return
 	}
+	ret.UserName = userInfo["UserName"]
+	ret.UserId = userInfo["UserId"]
+	ret.Auth = auth
+
 	code = define.SUCCESS_CODE
 	msg = define.SUCCESS_MSG
 	return
@@ -56,8 +60,10 @@ func AddOne(user userModel.User) (code int, msg string) {
 
 func Login(user userModel.User) (code int, msg string, RetData ReturnInfo) {
 	userInfo := userModel.GetUserInfoByUserName(user.UserName)
+	beego.Debug("lgin 111")
 	// password err
 	if util.Md5(user.Password) != userInfo.Password {
+		beego.Debug("lgin password %s, userinfo %s,", user.Password, userInfo.Password)
 		code = define.ERR_USER_PASSWORD_CODE
 		msg = define.ERR_USER_PASSWORD_MSG
 		return
@@ -76,6 +82,21 @@ func Login(user userModel.User) (code int, msg string, RetData ReturnInfo) {
 	RetData = ReturnInfo{auth, userInfo.Id, userInfo.UserName}
 	if err != nil {
 		beego.Error("redis set auth err: %s", err)
+	}
+
+	code = define.SUCCESS_CODE
+	msg = define.SUCCESS_MSG
+	return
+}
+
+func DeleteAuth(auth string) (code int, msg string) {
+	err := redis.InitRedis()
+	if err != nil {
+		beego.Error("redis init  err: %s", err)
+	}
+
+	if err := redis.Delete(auth); err != nil {
+		beego.Error("redis delete auth err: %s", err)
 	}
 
 	code = define.SUCCESS_CODE

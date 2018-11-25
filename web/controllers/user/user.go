@@ -5,6 +5,7 @@ import (
 	"im/web/controllers"
 	"encoding/json"
 	"im/web/logic/userLogic"
+	"im/web/libs/define"
 )
 
 // Operations about Users
@@ -95,6 +96,7 @@ func (u *UserController) CheckAuth() {
 		authInfo userModel.Auth
 	)
 	json.Unmarshal(u.Ctx.Input.RequestBody, &authInfo)
+
 	code, msg := u.CheckParams(authInfo)
 	if code != 0 {
 		u.Data["json"] = u.RenderDataSimple(code, msg)
@@ -102,9 +104,10 @@ func (u *UserController) CheckAuth() {
 		return
 	}
 
-	code, msg = userLogic.CheckAuth(authInfo.Auth)
+	code, msg, retData := userLogic.CheckAuth(authInfo.Auth)
+	u.Data["json"] = u.RenderData(code, msg, retData)
 
-	u.Data["json"] = u.RenderDataSimple(code, msg)
+
 	u.ServeJSON()
 	return
 
@@ -115,5 +118,18 @@ func (u *UserController) CheckAuth() {
 // @Success 200 {string} logout success
 // @router /logout [get]
 func (u *UserController) Logout() {
+	auth := u.Input().Get("auth")
+	if auth == "" {
+		u.Data["json"] = u.RenderDataSimple(define.ERR_PARAM_VAILD_CODE, define.ERR_PARAM_VAILD_MSG)
+		u.ServeJSON()
+		return
+	}
+
+	code, msg := userLogic.DeleteAuth(auth)
+	u.Data["json"] = u.RenderDataSimple(code, msg)
+
+	u.ServeJSON()
+	return
+
 
 }
