@@ -64,10 +64,13 @@ func serveWs(server *Server, w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) readPump(ch *Channel) {
 	defer func() {
-
+		disconnArg := new(proto.DisconnArg)
+		disconnArg.RoomId = ch.Room.Id
 		s.Bucket(ch.uid).delCh(ch)
+		if err := s.operator.Disconnect(disconnArg); err != nil {
+			log.Warnf("Disconnect err :%s", err)
+		}
 		ch.conn.Close()
-
 	}()
 
 	ch.conn.SetReadLimit(s.Options.MaxMessageSize)

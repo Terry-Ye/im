@@ -37,12 +37,13 @@ func RedisPublishCh(serverId int8, uid string, msg []byte) (err error) {
 
 	redisMsgStr, err := json.Marshal(redisMsg)
 
-	log.Infof("redisMsg info : %s", redisMsgStr)
+	log.Infof("RedisPublishCh redisMsg info : %s", redisMsgStr)
 
 	err = RedisCli.Publish(define.REDIS_SUB, redisMsgStr).Err()
 	return
 }
 
+// 发布到房间
 func RedisPublishRoom(rid int32, msg []byte) (err error) {
 	var redisMsg = &proto.RedisMsg{
 		Op: define.OP_ROOM_SEND,
@@ -50,10 +51,23 @@ func RedisPublishRoom(rid int32, msg []byte) (err error) {
 		Msg: msg,
 	}
 	redisMsgStr, err := json.Marshal(redisMsg)
-	log.Infof("redisMsg info : %s", redisMsgStr)
+	log.Infof("RedisPublishRoom redisMsg info : %s", redisMsgStr)
 	err = RedisCli.Publish(define.REDIS_SUB, redisMsgStr).Err()
 	return
 }
+
+func RedisPublishRoomCount(rid int32, count int) (err error) {
+	var redisMsg = &proto.RedisRoomCount{
+		Op: define.OP_ROOM_COUNT_SEND,
+		RoomId: rid,
+		Count: count,
+	}
+	redisMsgStr, err := json.Marshal(redisMsg)
+	log.Infof("RedisPublishRoomCount redisMsg info : %s", redisMsgStr)
+	err = RedisCli.Publish(define.REDIS_SUB, redisMsgStr).Err()
+	return
+}
+
 
 func getKey(key string) (string){
 

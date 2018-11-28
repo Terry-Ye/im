@@ -6,6 +6,7 @@ import (
 	"im/libs/proto"
 	"context"
 	"github.com/smallnest/rpcx/client"
+	"encoding/json"
 )
 
 type CometRpc int
@@ -61,7 +62,6 @@ func broadcastRoomToComet(RoomId int32, msg []byte) {
 			Ver:1,
 			Operation:define.OP_ROOM_SEND,
 			Body:msg,
-
 		},
 	}
 	reply := &proto.SuccessReply{}
@@ -72,5 +72,37 @@ func broadcastRoomToComet(RoomId int32, msg []byte) {
 	}
 }
 
+
+func broadcastRoomCountToComet(RoomId int32, count int) {
+
+	var (
+		body []byte
+		err error
+	)
+	msg :=	&proto.RedisRoomCountMsg{
+		Count : count,
+		Op : define.OP_ROOM_COUNT_SEND,
+	}
+
+	if body, err = json.Marshal(msg); err != nil {
+		log.Warnf("broadcastRoomCountToComet  json.Marshal err :%s", err)
+		return
+	}
+
+	pushMsgArg := &proto.RoomMsgArg{
+		RoomId:RoomId, P:proto.Proto{
+			Ver:1,
+			Operation:define.OP_ROOM_SEND,
+			Body: body,
+		},
+	}
+
+
+	reply := &proto.SuccessReply{}
+	for _, rpc :=  range RpcClientList {
+		log.Infof("broadcastRoomToComet rpc  %v", rpc)
+		rpc.Call(context.Background(), "PushRoomCount", pushMsgArg, reply)
+	}
+}
 
 

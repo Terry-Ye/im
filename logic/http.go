@@ -15,10 +15,8 @@ import (
 
 type retData struct {
 	Code int
-	Msg string
+	Msg  string
 }
-
-
 
 func InitHTTP() (err error) {
 	// ServrMux 本质上是一个 HTTP 请求路由器
@@ -29,6 +27,7 @@ func InitHTTP() (err error) {
 		httpServeMux := http.NewServeMux()
 		httpServeMux.HandleFunc("/api/v1/push", Push)
 		httpServeMux.HandleFunc("/api/v1/pushRoom", PushRoom)
+		httpServeMux.HandleFunc("/api/v1/count", Count)
 
 		if network, addr, err = inet.ParseNetwork(Conf.Base.HttpAddrs[i]); err != nil {
 			log.Errorf("inet.ParseNetwork() error(%v)", err)
@@ -50,13 +49,13 @@ func PushRoom(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	var (
-		auth = r.URL.Query().Get("auth")
-		err       error
-		bodyBytes []byte
-		body      string
-		sendData *proto.Send
+		auth         = r.URL.Query().Get("auth")
+		err          error
+		bodyBytes    []byte
+		body         string
+		sendData     *proto.Send
 		formUserInfo *proto.Router
-		res       = map[string]interface{}{"code": define.SEND_ERR, "msg":define.SEND_ERR_MSG}
+		res          = map[string]interface{}{"code": define.SEND_ERR, "msg": define.SEND_ERR_MSG}
 	)
 
 	// get roomId
@@ -66,11 +65,6 @@ func PushRoom(w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
-	if formUserInfo, err = getRouter(auth); err != nil {
-		log.Errorf("get router error : %s", err)
-
-		return
-	}
 
 	if bodyBytes, err = ioutil.ReadAll(r.Body); err != nil {
 		res["code"] = define.NETWORK_ERR
@@ -79,27 +73,31 @@ func PushRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if formUserInfo, err = getRouter(auth); err != nil {
+		log.Errorf("get router error : %s", err)
+		return
+	}
+
 	defer retPWrite(w, r, res, &body, time.Now())
 	body = string(bodyBytes)
 	log.Infof("PushRoom get bodyBytes : %s", body)
-
 	json.Unmarshal(bodyBytes, &sendData)
-	sendData.FormUserName = formUserInfo.UserName 
+	sendData.FormUserName = formUserInfo.UserName
 	sendData.FormUserId = formUserInfo.UserId
+	sendData.Op = define.OP_ROOM_SEND
+
 	if bodyBytes, err = json.Marshal(sendData); err != nil {
 		log.Errorf("redis Publish room err: %s", err)
 		return
 	}
 
-
-
 	if err := RedisPublishRoom(int32(rid), bodyBytes); err != nil {
 		log.Errorf("redis Publish room err: %s", err)
 	}
+
 	res["code"] = define.SUCCESS_REPLY
 	res["msg"] = define.SUCCESS_REPLY_MSG
 	return
-
 
 }
 func Push(w http.ResponseWriter, r *http.Request) {
@@ -108,17 +106,15 @@ func Push(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
-		auth      = r.URL.Query().Get("auth")
-		acceptUserId     = r.URL.Query().Get("userId")
-		err       error
-		bodyBytes []byte
-		body      string
+		auth         = r.URL.Query().Get("auth")
+		acceptUserId = r.URL.Query().Get("userId")
+		err          error
+		bodyBytes    []byte
+		body         string
 		formUserInfo *proto.Router
-		res       = map[string]interface{}{"code": define.SUCCESS_REPLY, "msg":define.SUCCESS_REPLY_MSG}
-		sendData *proto.Send
-
+		res          = map[string]interface{}{"code": define.SUCCESS_REPLY, "msg": define.SUCCESS_REPLY_MSG}
+		sendData     *proto.Send
 	)
-
 
 	if formUserInfo, err = getRouter(auth); err != nil {
 		log.Errorf("get router error : %s", err)
@@ -126,7 +122,6 @@ func Push(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Infof("push round userId %s", formUserInfo.UserId)
-
 
 	if bodyBytes, err = ioutil.ReadAll(r.Body); err != nil {
 		res["code"] = define.NETWORK_ERR
@@ -149,22 +144,50 @@ func Push(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(bodyBytes, &sendData)
 	sendData.FormUserName = formUserInfo.UserName
 	sendData.FormUserId = formUserInfo.UserId
+	sendData.Op = define.OP_SINGLE_SEND
 	if bodyBytes, err = json.Marshal(sendData); err != nil {
 		log.Errorf("redis Publish err: %s", err)
 	}
 	body = string(bodyBytes)
-	// log.Infof("get bodyBytes : %s", body)
-	// log.Infof("get sendUserId : %s", acceptUserId)
-	// log.Infof("get userId : %s", formUserInfo.UserId)
-	// log.Infof("get sid : %d", sid)
-
 
 	if err := RedisPublishCh(int8(sid), acceptUserId, bodyBytes); err != nil {
 		log.Errorf("redis Publish err: %s", err)
 
 	}
 
+}
 
+func Count(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method Not Allowed", 405)
+	}
+	var (
+		ridStr = r.URL.Query().Get("rid")
+		count  int
+		err    error
+		rid    int
+		res    = map[string]interface{}{"code": define.SEND_ERR, "msg": define.SEND_ERR_MSG}
+	)
+
+	if count, err = RedisCli.Get(getKey(ridStr)).Int(); err != nil {
+		log.Warnf("Count redis get rid:%d, count err: %s", err)
+		return
+	}
+
+	if rid, err = strconv.Atoi(ridStr); err != nil {
+		log.Warnf("Count redis Count rid:%d, count err: %s", rid, err)
+		return
+	}
+
+	if err = RedisPublishRoomCount(int32(rid), count); err != nil {
+		log.Warnf("Count redis RedisPublishRoomCount err: %s", err)
+		return
+	}
+
+	res["code"] = define.SUCCESS_REPLY
+	res["msg"] = define.SUCCESS_REPLY_MSG
+	defer retWrite(w, r, res, time.Now())
+	return
 }
 
 func httpListen(mux *http.ServeMux, network, addr string) {
@@ -192,16 +215,31 @@ func retPWrite(w http.ResponseWriter, r *http.Request, res map[string]interface{
 	dataStr := string(data)
 	log.Infof("dataStr %s", dataStr)
 
-
-
-
-	w.Header().Set("Access-Control-Allow-Origin", "*")             //允许访问所有域
-	w.Header().Add("Access-Control-Allow-Headers", "Content-Type") //header的类型
+	w.Header().Set("Access-Control-Allow-Origin", "*")             // 允许访问所有域
+	w.Header().Add("Access-Control-Allow-Headers", "Content-Type") // header的类型
 	w.Header().Set("content-type", "application/json")
-	//返回数据格式是json
+	// 返回数据格式是json
 	if _, err := w.Write([]byte(dataStr)); err != nil {
 		log.Errorf("w.Write(\"%s\") error(%v)", dataStr, err)
 	}
 
 	log.Infof("req: \"%s\", post: \"%s\", res:\"%s\", ip:\"%s\", time:\"%fs\"", r.URL.String(), *body, dataStr, r.RemoteAddr, time.Now().Sub(start).Seconds())
+}
+
+// retWrite marshal the result and write to client(get).
+func retWrite(w http.ResponseWriter, r *http.Request, res map[string]interface{}, start time.Time) {
+	data, err := json.Marshal(res)
+	if err != nil {
+		log.Error("json.Marshal(\"%v\") error(%v)", res, err)
+		return
+	}
+	dataStr := string(data)
+	w.Header().Set("Access-Control-Allow-Origin", "*")             // 允许访问所有域
+	w.Header().Add("Access-Control-Allow-Headers", "Content-Type") // header的类型
+	w.Header().Set("content-type", "application/json")
+	if _, err := w.Write([]byte(dataStr)); err != nil {
+		log.Error("w.Write(\"%s\") error(%v)", dataStr, err)
+	}
+
+	log.Info("req: \"%s\", get: res:\"%s\", ip:\"%s\", time:\"%fs\"", r.URL.String(), dataStr, r.RemoteAddr, time.Now().Sub(start).Seconds())
 }

@@ -24,10 +24,6 @@ type Auth struct {
 	Auth string `valid:"Required;MinSize(3);MaxSize(20)"`
 }
 
-func Login(username, password string) bool {
-
-	return false
-}
 
 func GetOne(userId string) (User *User, err error) {
 	o := orm.NewOrm()

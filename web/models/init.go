@@ -31,6 +31,11 @@ func init() {
 
 	orm.RegisterDataBase("default", "mysql", getDbStr(userModel.USER_DB), 30)
 	orm.RegisterModelWithPrefix("tb_", new(userModel.User))
+	orm.SetMaxIdleConns("default", 1000)
+	orm.SetMaxOpenConns("default", 1000)
+
+	// db,_ := orm.GetDB("mysql")
+	// db.SetConnMaxLifetime(3)
 	// orm.RegisterModel(new(UserModel.User))
 
 }

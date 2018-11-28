@@ -8,12 +8,22 @@ type ConnArg struct {
 
 type ConnReply struct {
 	Uid string
-
 }
+
+
+type DisconnArg struct {
+	RoomId int32
+}
+
+type DisconnReply struct {
+	Has bool
+}
+
 
 type Send struct {
 	Code int32 `json:"code"`
 	Msg string `json:"msg"`
-	FormUserId string `json:"formUserId"`
-	FormUserName string `json:"formUserName"`
+	FormUserId string `json:"fuid"`
+	FormUserName string `json:"fname"`
+	Op int32 `json:"op"`
 }

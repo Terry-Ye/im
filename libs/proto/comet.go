@@ -15,3 +15,9 @@ type RoomMsgArg struct {
 
 
 
+type RoomCountArg struct {
+	RoomId int32
+	Count  int
+}
+
+

@@ -35,16 +35,16 @@ func createServer(network string, addr string) {
 }
 
 
-func (rpc *PushRpc) MPushMsg(ctx context.Context, args *proto.PushMsgArg, noReply *proto.NoReply) (err error) {
-
-	log.Info("rpc PushMsg :%v ", args)
-	if args == nil {
-		log.Errorf("rpc PushRpc() error(%v)", err)
-		return
-	}
-
-	return
-}
+// func (rpc *PushRpc) MPushMsg(ctx context.Context, args *proto.PushMsgArg, noReply *proto.NoReply) (err error) {
+//
+// 	log.Info("rpc PushMsg :%v ", args)
+// 	if args == nil {
+// 		log.Errorf("rpc PushRpc() error(%v)", err)
+// 		return
+// 	}
+//
+// 	return
+// }
 
 func (rpc *PushRpc) PushSingleMsg(ctx context.Context, args *proto.PushMsgArg, SuccessReply *proto.SuccessReply) (err error) {
 	var(
@@ -84,6 +84,16 @@ func (rpc *PushRpc) PushRoomMsg(ctx context.Context, args *proto.RoomMsgArg, Suc
 	return
 }
 
+func (rpc *PushRpc) PushRoomCount(ctx context.Context, args *proto.RoomMsgArg, SuccessReply *proto.SuccessReply) (err error) {
+	SuccessReply.Code = define.SUCCESS_REPLY
+	SuccessReply.Msg = define.SUCCESS_REPLY_MSG
+	log.Infof("PushRoomCount count %v", args)
+	for _, bucket :=range DefaultServer.Buckets {
+		bucket.BroadcastRoom(args)
+		// room.next
 
+	}
+	return
+}
 
 

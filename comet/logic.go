@@ -39,3 +39,11 @@ func connect(connArg *proto.ConnArg) (uid string, err error) {
 
 	return
 }
+
+func disconnect(disconnArg *proto.DisconnArg) (err error){
+	reply := &proto.DisconnReply{}
+	if err = logicRpcClient.Call(context.Background(), "Disconnect", disconnArg, reply); err != nil {
+		log.Fatalf("failed to call: %v", err)
+	}
+	return
+}

@@ -6,7 +6,7 @@ import (
 	"context"
 	log "github.com/sirupsen/logrus"
 	"im/libs/proto"
-
+	"strconv"
 	"im/libs/define"
 	"time"
 )
@@ -26,7 +26,6 @@ func InitRPC() (err error) {
 
 		go createServer(network, addr)
 	}
-	// select {}
 	return
 }
 
@@ -60,12 +59,19 @@ func (rpc *LogicRpc) Connect(ctx context.Context, args *proto.ConnArg, reply *pr
 		if err != nil {
 			log.Infof("logic set err:%s", err)
 		}
+		// RedisCli.HIncrBy(define.REDIS_IM_COUNT, getKey(strconv.FormatInt(int64(args.RoomId),10)), 1)
 	}
-
+	RedisCli.Incr(getKey(strconv.FormatInt(int64(args.RoomId),10)))
 
 
 	log.Infof("logic rpc uid:%s", reply.Uid)
 
+	return
+}
+
+func (rpc *LogicRpc) Disconnect(ctx context.Context, args *proto.DisconnArg, reply *proto.DisconnReply) (err error) {
+	// 房间人数减少
+	RedisCli.Decr(getKey(strconv.FormatInt(int64(args.RoomId),10))).Result()
 	return
 }
 

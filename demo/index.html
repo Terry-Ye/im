@@ -30,7 +30,7 @@
                 </div>
                 <div class="detail">
                     <p class="title" id="roomTitle">AT直播间</p>
-                    <p class="desc">主播：<span id="roomCreator">AT</span>&nbsp;&nbsp;在线人数：<span id="roomOnlineMemberNum">1</span></p>
+                    <p class="desc">主播：<span id="roomCreator">AT</span>&nbsp;&nbsp;在线人数：<span id="roomOnlineMemberNum">-</span></p>
                 </div>
             </div>
             <div class="media">
@@ -124,6 +124,8 @@
         //onopen监听连接打开
         websocket.onopen = function (evt) {
             websocket.send(JSON.stringify(data))
+            // 发送获取人数
+            sendGetCount()
 
         };
         //监听连接关闭
@@ -133,12 +135,31 @@
         //onmessage 监听服务器数据推送
         websocket.onmessage = function (evt) {
             var data = JSON.parse(evt.data)
-            var innerInfo = '<div class="item" ><p class="nick guest j-nick " data-role="guest" data-account="oqzw45cvvheebryvjifu8ido6fmm">'+ data.formUserName +'</p><p class="text">' + data.msg +'</p></div>'
-            msg.innerHTML += innerInfo +'<br>';
+            if(data.op == 3) {
+                var innerInfo = '<div class="item" ><p class="nick guest j-nick " data-role="guest" data-account="oqzw45cvvheebryvjifu8ido6fmm">'+ data.fname +'</p><p class="text">' + data.msg +'</p></div>'
+                msg.innerHTML += innerInfo +'<br>';
+            }else if(data.op == 4) {
+                $("#roomOnlineMemberNum").text(data.count);
+            }
         };
+
     });
 
-
+    function sendGetCount() {
+        $.ajax({
+            type: "POST",// 方法类型
+            dataType: "json",// 预期服务器返回的数据类型
+            url: "http://localhost:6921/api/v1/count?rid=1" ,// url
+            success: function (result) {
+                if (result.code != 0) {
+                    alert("请求出错，请稍后重试！")
+                }
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    }
 
     function send(){
         var msg = document.getElementById('editText').value;
