@@ -78,7 +78,7 @@
                 success: function (result) {
 
                     if (result.code === 0) {
-                        setCookie("auth", result.data.Auth)
+                        localStorage.setItem("auth", result.data.Auth)
                         window.location.href = "http://localhost:1999/";
                     }else {
                         alert(result.msg)
@@ -89,25 +89,7 @@
                 }
             });
         }
-
-
-        function getCookie(name)
-        {
-            var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
-
-            if(arr=document.cookie.match(reg))
-
-                return unescape(arr[2]);
-            else
-                return null;
-        }
-
-        function setCookie(name,value)
-        {
-            var exp = new Date();
-            exp.setTime(exp.getTime() + 864000);
-            document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString() + ";path=/";
-        }
+        
 
     </script>
     
