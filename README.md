@@ -65,10 +65,10 @@ nohup $GOPATH/bin/job -d $GOPATH/src/im/job/ 2>&1 > /data/log/im/job.log &
 聊天室：http://www.texixi.com:1999/
 
 ### 使用的包
-log: github.com/sirupsen/logrus
-rpc: github.com/smallnest/rpcx
-websocket: github.com/gorilla/websocket
-配置文件：github.com/spf13/viper
+* log: github.com/sirupsen/logrus
+* rpc: github.com/smallnest/rpcx
+* websocket: github.com/gorilla/websocket
+* 配置文件：github.com/spf13/viper
 
 ### 后续计划
 1. 在线列表
