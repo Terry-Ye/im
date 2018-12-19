@@ -58,11 +58,14 @@ nohup $GOPATH/bin/job -d $GOPATH/src/im/job/ 2>&1 > /data/log/im/job.log &
 
 ```
 
+3. [im_api](https://github.com/Terry-Ye/im_api)  是im系统中使用的接口，需要像demo那样整体跑起来需要完整的部署
+
 ### 部署注意事项
 1. 部署服务器注意防火墙是否开放对应的端口(本地不需要，具体需要的端口在各层的配置文件)
 
 ### demo
 聊天室：http://www.texixi.com:1999/
+
 
 ### 使用的包
 * log: github.com/sirupsen/logrus

@@ -89,7 +89,7 @@
                 data:   jsonData ,
                 success: function (result) {
                     if (result.code == 0) {
-                        setCookie("auth", result.data.Auth)
+                        localStorage.setItem("auth", result.data.Auth)
                         window.location.href="http://localhost:1999/";
 
                     }else{
@@ -101,12 +101,7 @@
                 }
             });
         }
-        function setCookie(name,value)
-        {
-            var exp = new Date();
-            exp.setTime(exp.getTime() + 86400);
-            document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString() + ";path=/";
-        }
+
 
 
     </script>
