@@ -73,13 +73,13 @@
                 // 几个参数需要注意一下
                 type: "POST",// 方法类型
                 dataType: "json",// 预期服务器返回的数据类型
-                url: "http://www.texixi.com:8080/v1/user/login",//url
+                url: "https://www.texixi.com:8080/v1/user/login",//url
                 data:   jsonData,
                 success: function (result) {
 
                     if (result.code === 0) {
                         setCookie("auth", result.data.Auth)
-                        window.location.href = "http://www.texixi.com:1999/";
+                        window.location.href = "https://www.texixi.com:1999/";
                     }else {
                         alert(result.msg)
                     }
