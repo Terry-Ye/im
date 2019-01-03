@@ -5,12 +5,12 @@ import (
 	"im/libs/proto"
 	inet "im/libs/net"
 	log "github.com/sirupsen/logrus"
-	"net"
 	"io/ioutil"
 	"strconv"
 	"time"
 	"encoding/json"
 	"im/libs/define"
+	"net"
 )
 
 type retData struct {
@@ -42,7 +42,21 @@ func InitHTTP() (err error) {
 	}
 	return
 }
+func httpListen(mux *http.ServeMux, network, addr string) {
 
+	httpServer := &http.Server{Handler: mux, ReadTimeout: Conf.Base.HTTPReadTimeout, WriteTimeout: Conf.Base.HTTPWriteTimeout}
+	httpServer.SetKeepAlivesEnabled(true)
+
+	l, err := net.Listen(network, addr)
+	if err != nil {
+		log.Errorf("net.Listen(\"%s\", \"%s\") error(%v)", network, addr, err)
+		panic(err)
+	}
+	if err := httpServer.Serve(l); err != nil {
+		log.Errorf("server.Serve() error(%v)", err)
+		panic(err)
+	}
+}
 func PushRoom(w http.ResponseWriter, r *http.Request) {
 	// if r.Method != "POST" {
 	// 	http.Error(w, "Method Not Allowed", 405)
@@ -190,21 +204,7 @@ func Count(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func httpListen(mux *http.ServeMux, network, addr string) {
 
-	httpServer := &http.Server{Handler: mux, ReadTimeout: Conf.Base.HTTPReadTimeout, WriteTimeout: Conf.Base.HTTPWriteTimeout}
-	httpServer.SetKeepAlivesEnabled(true)
-
-	l, err := net.Listen(network, addr)
-	if err != nil {
-		log.Errorf("net.Listen(\"%s\", \"%s\") error(%v)", network, addr, err)
-		panic(err)
-	}
-	if err := httpServer.Serve(l); err != nil {
-		log.Errorf("server.Serve() error(%v)", err)
-		panic(err)
-	}
-}
 
 func retPWrite(w http.ResponseWriter, r *http.Request, res map[string]interface{}, body *string, start time.Time) {
 	data, err := json.Marshal(res)
