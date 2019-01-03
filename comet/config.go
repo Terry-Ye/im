@@ -50,6 +50,8 @@ type BaseConf struct {
 	BroadcastSize   int
 	ReadBufferSize  int
 	WriteBufferSize int
+	CertPath       string  `mapstructure:"certPath"`
+	KeyPath        string  `mapstructure:"keyPath"`
 }
 
 type BucketConf struct {

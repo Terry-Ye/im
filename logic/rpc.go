@@ -61,9 +61,12 @@ func (rpc *LogicRpc) Connect(ctx context.Context, args *proto.ConnArg, reply *pr
 		}
 		// RedisCli.HIncrBy(define.REDIS_IM_COUNT, getKey(strconv.FormatInt(int64(args.RoomId),10)), 1)
 	}
-	RedisCli.Incr(getKey(strconv.FormatInt(int64(args.RoomId),10)))
+	count := RedisCli.Incr(getKey(strconv.FormatInt(int64(args.RoomId),10))).Val()
 
-
+	if err = RedisPublishRoomCount(int32(args.RoomId), int(count)); err != nil {
+		log.Warnf("Count redis RedisPublishRoomCount err: %s", err)
+		return
+	}
 	log.Infof("logic rpc uid:%s", reply.Uid)
 
 	return
@@ -71,7 +74,14 @@ func (rpc *LogicRpc) Connect(ctx context.Context, args *proto.ConnArg, reply *pr
 
 func (rpc *LogicRpc) Disconnect(ctx context.Context, args *proto.DisconnArg, reply *proto.DisconnReply) (err error) {
 	// 房间人数减少
-	RedisCli.Decr(getKey(strconv.FormatInt(int64(args.RoomId),10))).Result()
+
+	count := RedisCli.Decr(getKey(strconv.FormatInt(int64(args.RoomId),10))).Val()
+
+	log.Infof("RedisCli.Decr number:%d", count)
+	if err = RedisPublishRoomCount(args.RoomId, int(count)); err != nil {
+		log.Warnf("Count redis RedisPublishRoomCount err: %s", err)
+		return
+	}
 	return
 }
 

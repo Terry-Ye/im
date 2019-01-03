@@ -38,7 +38,7 @@
                     <input type="password" class="form-control" placeholder="请输入密码" name="Password" required="">
                 </div>
                 <input type='button' id="register" value='注 册' class="btn btn-primary block full-width m-b" onclick="register()">
-                <p class="text-muted text-center"><small>已经有账户了？</small><a href="http://localhost:1999/login.html">点此登录</a>
+                <p class="text-muted text-center"><small>已经有账户了？</small><a href="http://www.texixi.com:1999/login.html">点此登录</a>
                 </p>
 
             </form>
@@ -62,7 +62,7 @@
                     // 几个参数需要注意一下
                     type: "POST",//方法类型
                     dataType: "json",//预期服务器返回的数据类型
-                    url: "http://localhost:8080/v1/user/register" ,//url
+                    url: "http://www.texixi.com:8080/v1/user/register" ,//url
                     data:   JSON.stringify(formObject) ,
                     success: function (result) {
                         if (result.code == 0) {
@@ -85,12 +85,12 @@
                 //几个参数需要注意一下
                 type: "POST",//方法类型
                 dataType: "json",//预期服务器返回的数据类型
-                url: "http://localhost:8080/v1/user/login" ,//url
+                url: "http://www.texixi.com:8080/v1/user/login" ,//url
                 data:   jsonData ,
                 success: function (result) {
                     if (result.code == 0) {
-                        localStorage.setItem("auth", result.data.Auth)
-                        window.location.href="http://localhost:1999/";
+                        setCookie("auth", result.data.Auth)
+                        window.location.href="http://www.texixi.com:1999/";
 
                     }else{
                         alert(result.msg)
@@ -101,7 +101,10 @@
                 }
             });
         }
-
+        function setCookie(name,value)
+        {
+	    localStorage.setItem(name, value)
+        }
 
 
     </script>

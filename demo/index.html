@@ -15,7 +15,7 @@
             <img src="./static/9302457.jpeg" alt="头像" id="avatar">
             <!--a href="./roomManage.html" id="nickName">匿名</a-->
             <span id="nickName"></span>
-            <a href="http://localhost:1999/login.html" id="chatroom-login" style="display: none;">登录</a>
+            <a href="http://www.texixi.com:1999/login.html" id="chatroom-login" style="display: none;">登录</a>
             <a  id="chatroom-logout"  onclick="logout()">注销</a>
         </div>
 
@@ -65,7 +65,7 @@
             <div id="chatroom-anonymous" >
                 <em class="loginWarn">登录后方可发送消息</em>
                 <div class="loginBtn">
-                    <a href="http://localhost:1999/login.html" class="u-btn btn">登录聊天室</a>
+                    <a href="http://www.texixi.com:1999/register.html" class="u-btn btn">登录注册聊天室</a>
                 </div>
             </div>
 
@@ -77,7 +77,7 @@
 <script src="js/jquery.min.js?v=2.1.4"></script>
 <script type="text/javascript">
 
-    var websocket = new WebSocket("ws://localhost:6911/ws");
+    var websocket = new WebSocket("ws://www.texixi.com:8911/ws");
 
     $(document).ready(function()
     {
@@ -89,7 +89,7 @@
             type: "POST",// 方法类型
             contentType: "application/json",
             dataType: "json",// 预期服务器返回的数据类型
-            url: "http://localhost:8080/v1/user/check_auth" ,// url
+            url: "http://www.texixi.com:8080/v1/user/check_auth" ,// url
             data:  JSON.stringify(jsonData) ,
             success: function (result) {
                 if (result.code == 0) {
@@ -124,8 +124,8 @@
         //onopen监听连接打开
         websocket.onopen = function (evt) {
             websocket.send(JSON.stringify(data))
-            // 发送获取人数
-            sendGetCount()
+            // 暂时不使用接口触发 发送获取人数
+            // sendGetCount()
 
         };
         //监听连接关闭
@@ -145,21 +145,22 @@
 
     });
 
-    function sendGetCount() {
-        $.ajax({
-            type: "POST",// 方法类型
-            dataType: "json",// 预期服务器返回的数据类型
-            url: "http://localhost:6921/api/v1/count?rid=1" ,// url
-            success: function (result) {
-                if (result.code != 0) {
-                    alert("请求出错，请稍后重试！")
-                }
-            },
-            error : function() {
-                alert("异常！");
-            }
-        });
-    }
+    // 不使用接口触发
+    // function sendGetCount() {
+    //     $.ajax({
+    //         type: "POST",// 方法类型
+    //         dataType: "json",// 预期服务器返回的数据类型
+    //         url: "http://www.texixi.com:6921/api/v1/count?rid=1" ,// url
+    //         success: function (result) {
+    //             if (result.code != 0) {
+    //                 alert("请求出错，请稍后重试！")
+    //             }
+    //         },
+    //         error : function() {
+    //             alert("异常！");
+    //         }
+    //     });
+    // }
 
     function send(){
         var msg = document.getElementById('editText').value;
@@ -169,14 +170,14 @@
             // 几个参数需要注意一下
             type: "POST",// 方法类型
             dataType: "json",// 预期服务器返回的数据类型
-            url: "http://localhost:6921/api/v1/pushRoom?auth="+getCookie("auth")+"&rid=1" ,// url
+            url: "http://www.texixi.com:6921/api/v1/pushRoom?auth="+getCookie("auth")+"&rid=1" ,// url
             data: JSON.stringify(jsonData),
             success: function (result) {
                 if (result.code == 0) {
 
                 }else  {
                     alert("请先简单注册登录")
-                    window.location.href="http://localhost:1999/register.html";
+                    window.location.href="http://www.texixi.com:1999/register.html";
                 }
             },
             error : function() {
@@ -187,7 +188,7 @@
 
     function getCookie(name)
     {
-        return localStorage.getItem(name);
+	return localStorage.getItem(name);
     }
 
     function logout() {
@@ -195,11 +196,11 @@
             // 几个参数需要注意一下
             type: "GET",// 方法类型
             dataType: "json",// 预期服务器返回的数据类型
-            url: "http://localhost:8080/v1/user/logout?auth="+getCookie("auth") ,// url
+            url: "http://www.texixi.com:8080/v1/user/logout?auth="+getCookie("auth") ,// url
             // data: JSON.stringify(jsonData),
             success: function (result) {
                 if (result.code == 0) {
-                    window.location.href="http://localhost:1999/login.html";
+                    window.location.href="http://www.texixi.com:1999/login.html";
                 }else  {
                     alert("请求出错，请稍后重试！")
 

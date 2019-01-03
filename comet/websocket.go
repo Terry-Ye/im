@@ -38,6 +38,18 @@ func InitWebsocket(bind string) (err error) {
 	return err
 }
 
+func InitWebsocketWss(bind string) (err error) {
+	http.HandleFunc("/", serveHome)
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		serveWs(DefaultServer, w, r)
+	})
+
+
+	err = http.ListenAndServeTLS(bind, Conf.Base.CertPath, Conf.Base.KeyPath, nil)
+	return err
+}
+
+
 // serveWs handles websocket requests from the peer.
 func serveWs(server *Server, w http.ResponseWriter, r *http.Request) {
 

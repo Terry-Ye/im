@@ -66,6 +66,12 @@ func main() {
 	}
 
 
+	// if err := InitWebsocketWss(Conf.Websocket.Bind); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+
+
 
 
 
