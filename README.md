@@ -63,7 +63,7 @@ nohup $GOPATH/bin/job -d $GOPATH/src/im/job/ 2>&1 > /data/log/im/job.log &
 ### 部署注意事项
 1. 部署服务器注意防火墙是否开放对应的端口(本地不需要，具体需要的端口在各层的配置文件)
 
-### demo(暂时消息发送不成功，修改成https后有点问题，太困了，先睡觉，明天修复)
+### demo
 聊天室：https://www.texixi.com:1999/
 
 
@@ -75,5 +75,5 @@ nohup $GOPATH/bin/job -d $GOPATH/src/im/job/ 2>&1 > /data/log/im/job.log &
 
 ### 后续计划
 1. 在线列表
-2. 支持wss
+2. 监控
 3. 聊天机器人

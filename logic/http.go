@@ -44,6 +44,7 @@ func InitHTTP() (err error) {
 }
 func httpListen(mux *http.ServeMux, network, addr string) {
 
+	// ServeTLS
 	httpServer := &http.Server{Handler: mux, ReadTimeout: Conf.Base.HTTPReadTimeout, WriteTimeout: Conf.Base.HTTPWriteTimeout}
 	httpServer.SetKeepAlivesEnabled(true)
 
@@ -57,6 +58,49 @@ func httpListen(mux *http.ServeMux, network, addr string) {
 		panic(err)
 	}
 }
+
+func InitHTTPS() (err error) {
+	// ServrMux 本质上是一个 HTTP 请求路由器
+	var network, addr string
+
+	for i := 0; i < len(Conf.Base.HttpAddrs); i++ {
+
+		httpServeMux := http.NewServeMux()
+		httpServeMux.HandleFunc("/api/v1/push", Push)
+		httpServeMux.HandleFunc("/api/v1/pushRoom", PushRoom)
+		httpServeMux.HandleFunc("/api/v1/count", Count)
+
+		if network, addr, err = inet.ParseNetwork(Conf.Base.HttpAddrs[i]); err != nil {
+			log.Errorf("inet.ParseNetwork() error(%v)", err)
+			return
+		}
+
+		log.Infof("start http listen:\"%s\"", Conf.Base.HttpAddrs[i])
+
+		go httpsListen(httpServeMux, network, addr)
+		select {}
+
+	}
+	return
+}
+
+func httpsListen(mux *http.ServeMux, network, addr string) {
+
+	// ServeTLS
+	httpServer := &http.Server{Handler: mux, ReadTimeout: Conf.Base.HTTPReadTimeout, WriteTimeout: Conf.Base.HTTPWriteTimeout}
+	httpServer.SetKeepAlivesEnabled(true)
+
+	l, err := net.Listen(network, addr)
+	if err != nil {
+		log.Errorf("net.Listen(\"%s\", \"%s\") error(%v)", network, addr, err)
+		panic(err)
+	}
+	if err := httpServer.ServeTLS(l, Conf.Base.CertPath, Conf.Base.KeyPath); err != nil {
+		log.Errorf("server.Serve() error(%v)", err)
+		panic(err)
+	}
+}
+
 func PushRoom(w http.ResponseWriter, r *http.Request) {
 	// if r.Method != "POST" {
 	// 	http.Error(w, "Method Not Allowed", 405)

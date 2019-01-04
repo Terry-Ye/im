@@ -2,8 +2,8 @@
 pidfile = "/tmp/comet.pid"
 logfile = "/Users/AT/go/src/im/logs/comet/comet.log"
 serverId = 1
-certPath = "fullchain.pem"
-keyPath = "privkey.pem"
+certPath = "/etc/letsencrypt/live/texixi.com-0002/fullchain.pem"
+keyPath = "/etc/letsencrypt/live/texixi.com-0002/privkey.pem"
 
 [websocket]
 bind = "0.0.0.0:8911"

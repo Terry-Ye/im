@@ -35,6 +35,8 @@ type BaseConf struct {
 	RPCAddrs       []string `mapstructure:"RPCAddrs"` //
 	HTTPReadTimeout  time.Duration `mapstructure:"HTTPReadTimeout"`
 	HTTPWriteTimeout time.Duration `mapstructure:"HTTPWriteTimeout"`
+	CertPath       string  `mapstructure:"certPath"`
+	KeyPath        string  `mapstructure:"keyPath"`
 }
 
 func InitConfig() (err error) {

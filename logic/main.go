@@ -36,8 +36,13 @@ func main() {
 	}
 
 
+	// 这里是http
+	// if err := InitHTTP(); err != nil {
+	// 	log.Panic(fmt.Errorf("InitHttp() fatal error : %s \n", err))
+	// }
 
-	if err := InitHTTP(); err != nil {
+	// 使用https
+	if err := InitHTTPS(); err != nil {
 		log.Panic(fmt.Errorf("InitHttp() fatal error : %s \n", err))
 	}
 
