@@ -73,7 +73,6 @@ func NewConfig() *Config {
 		},
 		CometConf: []CometConf{
 			{Key: 1, Addr: "tcp@0.0.0.0:6912"},
-			{Key: 2, Addr: "tcp@0.0.0.0:6913"},
 		},
 	}
 }

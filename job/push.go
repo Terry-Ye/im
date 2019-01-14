@@ -40,8 +40,8 @@ func processPush(ch chan *pushArg) {
 }
 func push(msg string) (err error) {
 	m := &proto.RedisMsg{}
-	msgStr := []byte(msg)
-	if err := json.Unmarshal(msgStr, m); err != nil {
+	msgByte := []byte(msg)
+	if err := json.Unmarshal(msgByte, m); err != nil {
 		log.Infof(" json.Unmarshal err:%v ", err)
 	}
 	log.Infof("push m info %s", m)
@@ -60,9 +60,10 @@ func push(msg string) (err error) {
 		break;
 	case define.OP_ROOM_COUNT_SEND:
 		broadcastRoomCountToComet(m.RoomId, m.Count)
-
-
-
+	case define.OP_ROOM_INFO_SEND:
+		broadcastRoomInfoToComet(m.RoomId, m.RoomUserInfo)
 	}
+
+
 	return
 }

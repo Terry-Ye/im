@@ -40,7 +40,7 @@ func NewBucket(boptions BucketOptions) (b *Bucket) {
 }
 
 
-func (b *Bucket) Put(key string, rid int32, ch *Channel) (err error){
+func (b *Bucket) Put(uid string, rid int32, ch *Channel) (err error){
 	var (
 		room *Room
 		ok   bool
@@ -54,8 +54,8 @@ func (b *Bucket) Put(key string, rid int32, ch *Channel) (err error){
 		}
 		ch.Room = room
 	}
-
-	b.chs[key] = ch
+	ch.uid = uid
+	b.chs[uid] = ch
 	b.cLock.Unlock()
 
 	if room != nil {
@@ -122,4 +122,5 @@ func (b *Bucket) Room(rid int32) (room *Room) {
 func (b *Bucket) BroadcastRoom(arg *proto.RoomMsgArg) {
 	num := atomic.AddUint64(&b.routinesNum, 1) % b.boptions.RoutineAmount
 	b.routines[num] <- arg
+
 }

@@ -55,20 +55,17 @@ func main() {
 		BroadcastSize:   Conf.Base.BroadcastSize,
 	})
 
-	// log.Infof("server %v", DefaultServer)
-	// log.Panicf("buckets :%v", buckets)
 	log.Info("start InitPushRpc")
 	if err := InitPushRpc(Conf.RpcPushAdds); err != nil {
 		log.Fatal(err)
 	}
-	if err := InitWebsocket(Conf.Websocket.Bind); err != nil {
-		log.Fatal(err)
-	}
-
-
-	// if err := InitWebsocketWss(Conf.Websocket.Bind); err != nil {
+	// if err := InitWebsocket(Conf.Websocket.Bind); err != nil {
 	// 	log.Fatal(err)
 	// }
+
+	if err := InitWebsocketWss(Conf.Websocket.Bind); err != nil {
+		log.Fatal(err)
+	}
 
 
 

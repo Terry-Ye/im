@@ -6,7 +6,8 @@ type RedisMsg struct {
 	RoomId   int32  `json:"roomId,omitempty"`
 	UserId   string `json:"userId,omitempty"`
 	Msg      []byte `json:"msg"`
-	Count  int   `json:"count"`
+	Count    int    `json:"count"`
+	RoomUserInfo map[string]string `json:"RoomUserInfo"`
 }
 
 type RedisRoomCount struct {
@@ -15,9 +16,16 @@ type RedisRoomCount struct {
 	Count  int   `json:"count,omitempty"`
 }
 
+type RedisRoomInfo struct {
+	Op           int32  `json:"op"`
+	RoomId       int32  `json:"roomId,omitempty"`
+	Count        int    `json:"count,omitempty"`
+	RoomUserInfo map[string]string `json:"roomUserInfo"`
+}
+
 type RedisRoomCountMsg struct {
-	Count  int   `json:"count,omitempty"`
-	Op     int32 `json:"op"`
+	Count int   `json:"count,omitempty"`
+	Op    int32 `json:"op"`
 }
 
 // msg: "132"

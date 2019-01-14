@@ -13,6 +13,7 @@ type ConnReply struct {
 
 type DisconnArg struct {
 	RoomId int32
+	Uid string
 }
 
 type DisconnReply struct {

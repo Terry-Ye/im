@@ -46,27 +46,38 @@ func (rpc *LogicRpc) Connect(ctx context.Context, args *proto.ConnArg, reply *pr
 
 	key := getKey(args.Auth)
 	log.Infof("logic rpc key:%s", key)
-	reply.Uid = RedisCli.HGet(key, "UserId").Val()
+	userInfo, err := RedisCli.HGetAll(key).Result()
+	if err != nil {
+		log.Infof("RedisCli HGetAll key :%s , err:%s",key,  err)
+	}
 
+	reply.Uid = userInfo["UserId"]
+	roomUserKey := getRoomUserKey(strconv.Itoa(int(args.RoomId)))
+	// UserId
 	if reply.Uid == "" {
 		reply.Uid = define.NO_AUTH
 	}else {
 		userKey := getKey(reply.Uid)
-
 		log.Infof("logic redis set uid serverId:%s, serverId : %s", userKey, args.ServerId)
 		validTime := define.REDIS_BASE_VALID_TIME * time.Second
 		err  = RedisCli.Set(userKey, args.ServerId,  validTime).Err()
 		if err != nil {
-			log.Infof("logic set err:%s", err)
+			log.Warnf("logic set err:%s", err)
 		}
-		// RedisCli.HIncrBy(define.REDIS_IM_COUNT, getKey(strconv.FormatInt(int64(args.RoomId),10)), 1)
+		// write redis roomUserList
+		RedisCli.HSet(roomUserKey, reply.Uid, userInfo["UserName"])
 	}
 	count := RedisCli.Incr(getKey(strconv.FormatInt(int64(args.RoomId),10))).Val()
+	roomUserInfo, err := RedisCli.HGetAll(roomUserKey).Result()
+	if err != nil {
+		log.Warnf("RedisCli HGetAll roomUserInfo key:%s, err: %s", roomUserKey, err)
+	}
 
-	if err = RedisPublishRoomCount(int32(args.RoomId), int(count)); err != nil {
+	if err = RedisPublishRoomInfo(int32(args.RoomId), int(count), roomUserInfo); err != nil {
 		log.Warnf("Count redis RedisPublishRoomCount err: %s", err)
 		return
 	}
+
 	log.Infof("logic rpc uid:%s", reply.Uid)
 
 	return
@@ -74,9 +85,12 @@ func (rpc *LogicRpc) Connect(ctx context.Context, args *proto.ConnArg, reply *pr
 
 func (rpc *LogicRpc) Disconnect(ctx context.Context, args *proto.DisconnArg, reply *proto.DisconnReply) (err error) {
 	// 房间人数减少
-
 	count := RedisCli.Decr(getKey(strconv.FormatInt(int64(args.RoomId),10))).Val()
-
+	log.Infof("Disconnect  rpc uid:%s", args.Uid)
+	err = RedisCli.HDel(getRoomUserKey(strconv.Itoa(int(args.RoomId))), args.Uid).Err()
+	if err != nil {
+		log.Warnf("HDel getRoomUserKey err : %s", err)
+	}
 	log.Infof("RedisCli.Decr number:%d", count)
 	if err = RedisPublishRoomCount(args.RoomId, int(count)); err != nil {
 		log.Warnf("Count redis RedisPublishRoomCount err: %s", err)
