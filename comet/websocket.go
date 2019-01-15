@@ -158,15 +158,16 @@ func (s *Server) writePump(ch *Channel) {
 			ch.conn.SetWriteDeadline(time.Now().Add(s.Options.WriteWait))
 			if !ok {
 				// The hub closed the channel.
+				log.Warn("SetWriteDeadline not ok " )
 				ch.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 
 			w, err := ch.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
+				log.Warn(" ch.conn.NextWriter err :%s  ", err )
 				return
 			}
-			log.Printf("message write :%v", message)
 			log.Infof("message write body:%s", message.Body)
 			w.Write(message.Body)
 

@@ -44,20 +44,24 @@
             </div>
             <div class="announcement" id="roomAnnouncement"><a href="https://github.com/Terry-Ye/im ">中文文档地址</a></div>
            <ul class="tab">
-                <li class="crt j-tab" data-value="chat">直播互动</li>
-               <li class="j-tab" data-value="member">在线成员</li>
+                <li class="crt j-tab" data-value="chat" id="tab_chat" onclick="changeTab('chat')">直播互动</li>
+               <li class="j-tab" data-value="member"  id="tab_member"  onclick="changeTab('member')">在线成员</li>
 
             </ul>
             <div class="chat j-pannel j-chat" id="msg">
 
             </div>
 
-            <div class="member j-pannel hide">
+            <div class="member j-pannel hide" id="member_list">
                 <div class="list j-member">
+                    <div class="j-guestList"  id="member_info">
+                    </div>
                 </div>
-                <div class="more j-more">
-                    <a>加载更多</a>
-                </div>
+
+
+
+
+
             </div>
 
 
@@ -145,10 +149,20 @@
         websocket.onmessage = function (evt) {
             var data = JSON.parse(evt.data)
             if(data.op == 3) {
-                var innerInfo = '<div class="item" ><p class="nick guest j-nick " data-role="guest" data-account="oqzw45cvvheebryvjifu8ido6fmm">'+ data.fname +'</p><p class="text">' + data.msg +'</p></div>'
+                var innerInfo = '<div class="item" ><p class="nick guest j-nick " data-role="guest" data-account="">'+ data.fname +'</p><p class="text">' + data.msg +'</p></div>'
                 msg.innerHTML += innerInfo +'<br>';
             }else if(data.op == 4) {
                 $("#roomOnlineMemberNum").text(data.count);
+                var member            = document.getElementById("member_info");
+                var innerInfo = ""
+                for(var  k in data.roomUserInfo){
+                    innerInfo = innerInfo+'<div class="item" data-id="'+k+'"><div class="avatar"><img src="./static/9302457.jpeg"> </div> <div class="nick">'+data.roomUserInfo[k]+'</div> </div>'
+                }
+                member.innerHTML += innerInfo
+            }else if(data.op == 5 ) {
+
+
+
             }
         };
 
@@ -221,15 +235,23 @@
         });
     }
 
-    // var msg = document.getElementById("msg");
+    function changeTab(type) {
+        if(type == "chat") {
+
+            document.getElementById("tab_chat").className="crt j-tab"
+            document.getElementById("tab_member").className="j-tab"
+            document.getElementById("msg").className="chat j-pannel j-chat"
+            document.getElementById("member_list").className="member j-pannel hide"
 
 
+        }else{
+            document.getElementById("tab_chat").className="j-tab"
+            document.getElementById("tab_member").className="crt j-tab"
+            document.getElementById("member_list").className="member j-pannel"
+            document.getElementById("msg").className="chat j-pannel j-chat hide"
+        }
 
-    //监听连接错误信息
-    //    websocket.onerror = function (evt, e) {
-    //        console.log('Error occured: ' + evt.data);
-    //    };
-
+    }
 </script>
 
 
