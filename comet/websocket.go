@@ -77,9 +77,11 @@ func serveWs(server *Server, w http.ResponseWriter, r *http.Request) {
 func (s *Server) readPump(ch *Channel) {
 	defer func() {
 		disconnArg := new(proto.DisconnArg)
-		log.Infof("readPump ch.uid :%s", ch.uid)
+
 		disconnArg.RoomId = ch.Room.Id
-		disconnArg.Uid = ch.uid
+		if ch.uid != "" {
+			disconnArg.Uid = ch.uid
+		}
 		s.Bucket(ch.uid).delCh(ch)
 		if err := s.operator.Disconnect(disconnArg); err != nil {
 			log.Warnf("Disconnect err :%s", err)
