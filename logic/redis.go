@@ -86,6 +86,23 @@ func RedisPublishRoomInfo(rid int32, count int, RoomUserInfo map[string]string) 
 	return
 }
 
+/**
+	减少指定在线用户信息(暂未用到)
+ */
+func RedisPublishRoomUserLess(rid int32, count int, RoomUserInfo map[string]string) (err error) {
+	// , roomUserList []
+	var redisMsg = &proto.RedisRoomInfo{
+		Op: define.OP_ROOM_INFO_SEND,
+		RoomId: rid,
+		Count: count,
+		RoomUserInfo:RoomUserInfo,
+	}
+	redisMsgByte, err := json.Marshal(redisMsg)
+	log.Infof("RedisPublishRoomInfo redisMsg info : %s", redisMsgByte)
+	err = RedisCli.Publish(define.REDIS_SUB, redisMsgByte).Err()
+	return
+}
+
 
 func getKey(key string) (string){
 

@@ -28,6 +28,7 @@ func InitHTTP() (err error) {
 		httpServeMux.HandleFunc("/api/v1/push", Push)
 		httpServeMux.HandleFunc("/api/v1/pushRoom", PushRoom)
 		httpServeMux.HandleFunc("/api/v1/count", Count)
+		httpServeMux.HandleFunc("/api/v1/getRoomInfo", GetRoomInfo)
 
 		if network, addr, err = inet.ParseNetwork(Conf.Base.HttpAddrs[i]); err != nil {
 			log.Errorf("inet.ParseNetwork() error(%v)", err)
@@ -59,6 +60,7 @@ func httpListen(mux *http.ServeMux, network, addr string) {
 	}
 }
 
+
 func InitHTTPS() (err error) {
 	// ServrMux 本质上是一个 HTTP 请求路由器
 	var network, addr string
@@ -69,6 +71,7 @@ func InitHTTPS() (err error) {
 		httpServeMux.HandleFunc("/api/v1/push", Push)
 		httpServeMux.HandleFunc("/api/v1/pushRoom", PushRoom)
 		httpServeMux.HandleFunc("/api/v1/count", Count)
+		httpServeMux.HandleFunc("/api/v1/getRoomInfo", GetRoomInfo)
 
 		if network, addr, err = inet.ParseNetwork(Conf.Base.HttpAddrs[i]); err != nil {
 			log.Errorf("inet.ParseNetwork() error(%v)", err)
@@ -158,6 +161,10 @@ func PushRoom(w http.ResponseWriter, r *http.Request) {
 	return
 
 }
+
+/**
+
+ */
 func Push(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Method Not Allowed", 405)
@@ -215,6 +222,10 @@ func Push(w http.ResponseWriter, r *http.Request) {
 
 }
 
+
+/**
+	获取在线人数
+ */
 func Count(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Method Not Allowed", 405)
@@ -249,6 +260,40 @@ func Count(w http.ResponseWriter, r *http.Request) {
 }
 
 
+/**
+	获取房间信息
+ */
+func GetRoomInfo(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != "POST" {
+		http.Error(w, "Method Not Allowed", 405)
+	}
+	var (
+		ridStr = r.URL.Query().Get("rid")
+		rid    int
+		err    error
+		res    = map[string]interface{}{"code": define.SEND_ERR, "msg": define.SEND_ERR_MSG}
+	)
+
+
+	roomUserKey := getRoomUserKey(ridStr)
+	roomUserInfo, err := RedisCli.HGetAll(roomUserKey).Result()
+	if err != nil {
+		log.Warnf("RedisCli HGetAll roomUserInfo key:%s, err: %s", roomUserKey, err)
+	}
+	if rid, err = strconv.Atoi(ridStr); err != nil {
+		log.Warnf("Count redis Count rid:%d, count err: %s", rid, err)
+		return
+	}
+	if err = RedisPublishRoomInfo(int32(rid), len(roomUserInfo), roomUserInfo); err != nil {
+		log.Warnf("Count redis RedisPublishRoomCount err: %s", err)
+		return
+	}
+	res["code"] = define.SUCCESS_REPLY
+	res["msg"] = define.SUCCESS_REPLY_MSG
+	defer retWrite(w, r, res, time.Now())
+	return
+}
 
 func retPWrite(w http.ResponseWriter, r *http.Request, res map[string]interface{}, body *string, start time.Time) {
 	data, err := json.Marshal(res)

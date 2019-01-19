@@ -41,6 +41,7 @@ func (r *Room) Put(ch *Channel) (err error) {
 func (r *Room) Push(p *proto.Proto) {
 	r.rlock.RLock()
 	for ch := r.next; ch != nil; ch = ch.Next{
+		// log.Infof("Room Push info %v", p)
 		ch.Push(p)
 	}
 

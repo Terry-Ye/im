@@ -28,7 +28,7 @@ func getRouter(auth string) (router *proto.Router, err error) {
 	if err != nil {
 		return
 	}
-
+	log.Infof("getRouter auth :%s, userId:%s", auth, userInfo["UserId"])
 	router = &proto.Router{UserId: userInfo["UserId"], UserName: userInfo["UserName"]}
 	return
 

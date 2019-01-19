@@ -102,9 +102,10 @@ func (rpc *PushRpc) PushRoomCount(ctx context.Context, args *proto.RoomMsgArg, S
 	广播房间信息
  */
 func (rpc *PushRpc) PushRoomInfo(ctx context.Context, args *proto.RoomMsgArg, SuccessReply *proto.SuccessReply) (err error) {
+	log.Infof("PushRoomInfo  %v", args)
 	SuccessReply.Code = define.SUCCESS_REPLY
 	SuccessReply.Msg = define.SUCCESS_REPLY_MSG
-	log.Infof("PushRoomInfo  %v", args)
+
 	for _, bucket :=range DefaultServer.Buckets {
 		bucket.BroadcastRoom(args)
 		// room.next

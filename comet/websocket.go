@@ -82,6 +82,7 @@ func (s *Server) readPump(ch *Channel) {
 		if ch.uid != "" {
 			disconnArg.Uid = ch.uid
 		}
+
 		s.Bucket(ch.uid).delCh(ch)
 		if err := s.operator.Disconnect(disconnArg); err != nil {
 			log.Warnf("Disconnect err :%s", err)
@@ -150,9 +151,7 @@ func (s *Server) writePump(ch *Channel) {
 	log.Printf("ticker :%v", ticker)
 
 	defer func() {
-		s.Bucket(ch.uid).delCh(ch)
 		ticker.Stop()
-		ch.conn.Close()
 	}()
 	for {
 		select {

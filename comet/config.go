@@ -100,7 +100,7 @@ func NewConfig() *Config {
 			BroadcastSize:   512,
 		},
 		Bucket: BucketConf{
-			Num:      256,
+			Num:      8,
 			Channel:  1024,
 			Room:     1024,
 			SvrProto: 80,

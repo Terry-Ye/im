@@ -68,15 +68,8 @@ func (rpc *LogicRpc) Connect(ctx context.Context, args *proto.ConnArg, reply *pr
 		RedisCli.HSet(roomUserKey, reply.Uid, userInfo["UserName"])
 	}
 
-	roomUserInfo, err := RedisCli.HGetAll(roomUserKey).Result()
-	if err != nil {
-		log.Warnf("RedisCli HGetAll roomUserInfo key:%s, err: %s", roomUserKey, err)
-	}
-
-	if err = RedisPublishRoomInfo(int32(args.RoomId), len(roomUserInfo), roomUserInfo); err != nil {
-		log.Warnf("Count redis RedisPublishRoomCount err: %s", err)
-		return
-	}
+	// 增加房间人数
+	RedisCli.Incr(getKey(strconv.FormatInt(int64(args.RoomId),10)))
 
 	log.Infof("logic rpc uid:%s", reply.Uid)
 
@@ -84,13 +77,21 @@ func (rpc *LogicRpc) Connect(ctx context.Context, args *proto.ConnArg, reply *pr
 }
 
 func (rpc *LogicRpc) Disconnect(ctx context.Context, args *proto.DisconnArg, reply *proto.DisconnReply) (err error) {
-	// 房间人数减少
+
 	roomUserKey := getRoomUserKey(strconv.Itoa(int(args.RoomId)))
 
-	err = RedisCli.HDel(roomUserKey, args.Uid).Err()
-	if err != nil {
-		log.Warnf("HDel getRoomUserKey err : %s", err)
+	// 房间总人数减少
+	RedisCli.Decr(getKey(strconv.FormatInt(int64(args.RoomId),10))).Result()
+
+	// 房间登录人数减少
+	if args.Uid != define.NO_AUTH {
+		err = RedisCli.HDel(roomUserKey, args.Uid).Err()
+		if err != nil {
+			log.Warnf("HDel getRoomUserKey err : %s", err)
+		}
+
 	}
+
 	roomUserInfo, err := RedisCli.HGetAll(roomUserKey).Result()
 	if err != nil {
 		log.Warnf("RedisCli HGetAll roomUserInfo key:%s, err: %s", roomUserKey, err)

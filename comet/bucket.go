@@ -120,7 +120,9 @@ func (b *Bucket) Room(rid int32) (room *Room) {
 }
 
 func (b *Bucket) BroadcastRoom(arg *proto.RoomMsgArg) {
+	// 广播消息递增id
 	num := atomic.AddUint64(&b.routinesNum, 1) % b.boptions.RoutineAmount
+	// log.Infof("bucket routinesNum :%d", b.routinesNum)
 	b.routines[num] <- arg
 
 }
