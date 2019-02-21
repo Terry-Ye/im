@@ -4,6 +4,9 @@
 2. logic（业务逻辑层），无状态，各层通过rpc通讯，容易扩展，支持http接口来接收消息
 3. job（任务推送层）通过redsi 订阅发布功能进行推送到comet层。
 
+### 架构图
+![image](https://note.youdao.com/yws/public/resource/ac2abf3027ec5c46d62bb5d690d2ed18/xmlnote/WEBRESOURCEabe5f0a5c9699a8c878afac92f4dc6bb/3749)
+
 ### 时序图
 以下Comet 层，Logic 层，Job层都可以灵活扩展机器
 ![image](https://note.youdao.com/yws/public/resource/ac2abf3027ec5c46d62bb5d690d2ed18/xmlnote/WEBRESOURCE2b38217eac4718c99b817005e864fe5d/2921)
