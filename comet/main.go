@@ -27,27 +27,43 @@ func main() {
 	// log.Info("111 noteworthy happened!")
 	// 加入性能监控
 	perf.Init(Conf.Base.PprofBind)
+
+	if err := InitLogicRpc(Conf.RpcLogicAddrs); err != nil {
+
+		log.Panicf("InitLogicRpc Fatal error: %s \n", err)
+	}
+
 	// new server
 	Buckets := make([]*Bucket, Conf.Bucket.Num)
 
 	for i := 0; i < Conf.Bucket.Num; i++ {
 		Buckets[i] = NewBucket(BucketOptions{
-			ChannelSize: Conf.Bucket.Channel,
-			RoomSize:    Conf.Bucket.Room,
+			ChannelSize:   Conf.Bucket.Channel,
+			RoomSize:      Conf.Bucket.Room,
+			RoutineAmount: Conf.Bucket.RoutineAmount,
+			RoutineSize:   Conf.Bucket.RoutineSize,
 		})
 	}
-	DefaultServer := NewServer(Buckets, ServerOptions{
+	operator := new(DefaultOperator)
+	DefaultServer = NewServer(Buckets, operator, ServerOptions{
 		WriteWait:       Conf.Base.WriteWait,
 		PongWait:        Conf.Base.PongWait,
 		PingPeriod:      Conf.Base.PingPeriod,
 		MaxMessageSize:  Conf.Base.MaxMessageSize,
 		ReadBufferSize:  Conf.Base.ReadBufferSize,
 		WriteBufferSize: Conf.Base.WriteBufferSize,
+		BroadcastSize:   Conf.Base.BroadcastSize,
 	})
 
-	// log.Panicf("buckets :%v", buckets)
+	log.Info("start InitPushRpc")
+	if err := InitPushRpc(Conf.RpcPushAdds); err != nil {
+		log.Fatal(err)
+	}
+	// if err := InitWebsocket(Conf.Websocket.Bind); err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	if err := InitWebsocket(Conf.Websocket.Bind); err != nil {
+	if err := InitWebsocketWss(Conf.Websocket.Bind); err != nil {
 		log.Fatal(err)
 	}
 

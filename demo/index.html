@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>聊天室demo</title>
+    <link rel="stylesheet" href="./static/chartroom.css">
+</head>
+<body>
+<div class="m-head">
+    <div class="g-doc">
+        <div class="logo item">聊天室demo</div>
+
+
+
+        <div class="info item">
+            <img src="./static/9302457.jpeg" alt="头像" id="avatar">
+            <!--a href="./roomManage.html" id="nickName">匿名</a-->
+            <span id="nickName"></span>
+            <a href="https://www.texixi.com:1999/login.html" id="chatroom-login" style="display: none;">登录</a>
+            <a  id="chatroom-logout"  onclick="logout()">注销</a>
+        </div>
+
+    </div>
+</div>
+<div class="g-doc">
+    <div class="m-room" id="room">
+        <div class="g-left">
+            <div class="info">
+                <div class="avatar">
+                    <img class="image" id="roomAvatar" src="./static/9302457.jpeg">
+                </div>
+                <div class="detail">
+                    <p class="title" id="roomTitle">AT直播间</p>
+                    <p class="desc">主播：<span id="roomCreator">AT</span>&nbsp;&nbsp;在线人数：<span id="roomOnlineMemberNum">-</span></p>
+                </div>
+            </div>
+            <div class="media">
+                <img src="./static/WechatIMG237.jpeg" id="video" class="">
+            </div>
+        </div>
+        <div class="g-right">
+            <div class="m-status hide" id="linkStatus">连接中。。。</div>
+            <div class="announcement_title">
+                直播公告
+            </div>
+            <div class="announcement" id="roomAnnouncement"><a href="https://github.com/Terry-Ye/im ">中文文档地址</a></div>
+           <ul class="tab">
+                <li class="crt j-tab" data-value="chat" id="tab_chat" onclick="changeTab('chat')">直播互动</li>
+               <li class="j-tab" data-value="member"  id="tab_member"  onclick="changeTab('member')">在线成员</li>
+
+            </ul>
+            <div class="chat j-pannel j-chat" id="msg">
+
+            </div>
+
+            <div class="member j-pannel hide" id="member_list">
+                <div class="list j-member">
+                    <div class="j-guestList"  id="member_info">
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+
+
+            <div id="chatroom-verified">
+                <div class="edit">
+                    <textarea class="editText" id="editText" placeholder=""></textarea>
+                </div>
+                <div class="sendBtn">
+                    <a class="u-btn btn" id="sentText" onclick="send()">发送</a>
+                    <a class="btn custom" id="customBtn"></a>
+                    <a class="btn emoji" id="emoji"></a>
+                </div>
+            </div>
+            <div id="chatroom-anonymous" >
+                <em class="loginWarn">登录后方可发送消息</em>
+                <div class="loginBtn">
+                    <a href="https://www.texixi.com:1999/register.html" class="u-btn btn">登录注册聊天室</a>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script type="text/javascript">
+
+    var websocket = new WebSocket("wss://www.texixi.com:8911/ws");
+
+    $(document).ready(function()
+    {
+        // 检查auth
+        var auth = getCookie("auth")
+        var jsonData = {"Auth":auth}
+        $.ajax({
+            // 几个参数需要注意一下
+            type: "POST",// 方法类型
+            contentType: "application/json",
+            dataType: "json",// 预期服务器返回的数据类型
+            url: "https://www.texixi.com:8080/v1/user/check_auth" ,// url
+            data:  JSON.stringify(jsonData) ,
+            success: function (result) {
+                if (result.code == 0) {
+                    document.getElementById("chatroom-verified").style.display="block";
+                    document.getElementById("chatroom-anonymous").style.display = "none";
+                    $("#nickName").text(result.data.UserName);
+                    document.getElementById("nickName").style.display="inline";
+                    document.getElementById("chatroom-login").style.display="none";
+                    // chatroom-login
+                }else  {
+                    document.getElementById("chatroom-verified").style.display="none";
+                    document.getElementById("chatroom-anonymous").style.display="block";
+                    document.getElementById("nickName").style.display="none";
+                    document.getElementById("chatroom-login").style.display="inline";
+                    document.getElementById("chatroom-logout").style.display="none";
+
+
+                }
+
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+        // 连接websocket
+        //调用websocket对象建立连接：
+        var msg            = document.getElementById("msg");
+        //参数：ws/wss(加密)：//ip:port （字符串）
+
+        var data = {"auth":getCookie("auth"),"roomId":1}
+
+        //onopen监听连接打开
+        websocket.onopen = function (evt) {
+            websocket.send(JSON.stringify(data))
+            // 获取房间信息
+            getRoomInfo()
+
+        };
+        //监听连接关闭
+        //    websocket.onclose = function (evt) {
+        //        console.log("Disconnected");
+        //    };
+        //onmessage 监听服务器数据推送
+        websocket.onmessage = function (evt) {
+            var data = JSON.parse(evt.data)
+            if(data.op == 3) {
+                var innerInfo = '<div class="item" ><p class="nick guest j-nick " data-role="guest" data-account="">'+ data.fname +'</p><p class="text">' + data.msg +'</p></div>'
+                msg.innerHTML += innerInfo +'<br>';
+            }else if(data.op == 4) {
+
+                $("#roomOnlineMemberNum").text(data.count);
+                document.getElementById('member_info').innerHTML = "";
+                var member            = document.getElementById("member_info");
+                var innerInfo = ""
+                for(var  k in data.roomUserInfo){
+                    innerInfo = innerInfo+'<div class="item" data-id="'+k+'"><div class="avatar"><img src="./static/9302457.jpeg"> </div> <div class="nick">'+data.roomUserInfo[k]+'</div> </div>'
+                }
+                member.innerHTML += innerInfo
+            }else if(data.op == 5 ) {
+
+
+
+            }
+        };
+
+    });
+    function getRoomInfo() {
+        $.ajax({
+            type: "POST",// 方法类型
+            dataType: "json",// 预期服务器返回的数据类型
+            url: "https://www.texixi.com:6921/api/v1/getRoomInfo?rid=1" ,// url
+            success: function (result) {
+                if (result.code != 0) {
+                    alert("请求出错，请稍后重试！")
+                }
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    }
+
+
+    function send(){
+        var msg = document.getElementById('editText').value;
+        document.getElementById('editText').value = '';
+        var jsonData = {op: 3, msg:msg, rid: 1};
+        $.ajax({
+            // 几个参数需要注意一下
+            type: "POST",// 方法类型
+            dataType: "json",// 预期服务器返回的数据类型
+            url: "https://www.texixi.com:6921/api/v1/pushRoom?auth="+getCookie("auth")+"&rid=1" ,// url
+            data: JSON.stringify(jsonData),
+            success: function (result) {
+                if (result.code == 0) {
+
+                }else  {
+                    alert("请先简单注册登录")
+                    window.location.href="https://www.texixi.com:1999/register.html";
+                }
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    }
+
+    function getCookie(name)
+    {
+	return localStorage.getItem(name);
+    }
+
+    function logout() {
+        $.ajax({
+            // 几个参数需要注意一下
+            type: "GET",// 方法类型
+            dataType: "json",// 预期服务器返回的数据类型
+            url: "https://www.texixi.com:8080/v1/user/logout?auth="+getCookie("auth") ,// url
+            // data: JSON.stringify(jsonData),
+            success: function (result) {
+                if (result.code == 0) {
+                    window.location.href="https://www.texixi.com:1999/login.html";
+                }else  {
+                    alert("请求出错，请稍后重试！")
+
+                }
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    }
+
+    function changeTab(type) {
+        if(type == "chat") {
+
+            document.getElementById("tab_chat").className="crt j-tab"
+            document.getElementById("tab_member").className="j-tab"
+            document.getElementById("msg").className="chat j-pannel j-chat"
+            document.getElementById("member_list").className="member j-pannel hide"
+
+
+        }else{
+            document.getElementById("tab_chat").className="j-tab"
+            document.getElementById("tab_member").className="crt j-tab"
+            document.getElementById("member_list").className="member j-pannel"
+            document.getElementById("msg").className="chat j-pannel j-chat hide"
+        }
+
+    }
+</script>
+
+
+
+
+</body></html>
