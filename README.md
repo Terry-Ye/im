@@ -59,6 +59,10 @@ nohup $GOPATH/bin/comet -d $GOPATH/src/im/comet/ 2>&1 > /data/log/im/comet.log &
 
 nohup $GOPATH/bin/job -d $GOPATH/src/im/job/ 2>&1 > /data/log/im/job.log &
 
+// demo页面执行
+cd $GOPATH/src/im/demo
+go run main.go
+
 ```
 
 3. [im_api](https://github.com/Terry-Ye/im_api)  是im系统中使用的接口，需要像demo那样整体跑起来需要完整的部署
