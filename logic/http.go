@@ -1,16 +1,16 @@
 package main
 
 import (
-	"net/http"
-	"im/libs/proto"
-	inet "im/libs/net"
+	"encoding/json"
 	log "github.com/sirupsen/logrus"
+	"im/libs/define"
+	inet "im/libs/net"
+	"im/libs/proto"
 	"io/ioutil"
+	"net"
+	"net/http"
 	"strconv"
 	"time"
-	"encoding/json"
-	"im/libs/define"
-	"net"
 )
 
 type retData struct {
@@ -60,7 +60,6 @@ func httpListen(mux *http.ServeMux, network, addr string) {
 	}
 }
 
-
 func InitHTTPS() (err error) {
 	// ServrMux 本质上是一个 HTTP 请求路由器
 	var network, addr string
@@ -99,7 +98,9 @@ func httpsListen(mux *http.ServeMux, network, addr string) {
 		panic(err)
 	}
 	if err := httpServer.ServeTLS(l, Conf.Base.CertPath, Conf.Base.KeyPath); err != nil {
-		log.Errorf("server.Serve() error(%v)", err)
+
+		log.Errorf("Please check the certPath and keyPath of wss or other, error: %v", err)
+
 		panic(err)
 	}
 }
@@ -222,10 +223,10 @@ func Push(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
 /**
-	获取在线人数
- */
+获取在线人数
+*/
+
 func Count(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Method Not Allowed", 405)
@@ -259,10 +260,10 @@ func Count(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-
 /**
-	获取房间信息
- */
+获取房间信息
+*/
+
 func GetRoomInfo(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
@@ -274,7 +275,6 @@ func GetRoomInfo(w http.ResponseWriter, r *http.Request) {
 		err    error
 		res    = map[string]interface{}{"code": define.SEND_ERR, "msg": define.SEND_ERR_MSG}
 	)
-
 
 	roomUserKey := getRoomUserKey(ridStr)
 	roomUserInfo, err := RedisCli.HGetAll(roomUserKey).Result()

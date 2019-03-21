@@ -1,0 +1,15 @@
+[base]
+pidfile = "/tmp/logic.pid"
+
+RedisAddr = "localhost:6379"
+redisPw = ""
+RPCAddrs = "tcp@localhost:6923"
+
+certPath = ""
+keyPath = ""
+
+
+
+
+
+

@@ -15,14 +15,14 @@ var (
 )
 
 func init() {
-	flag.StringVar(&confPath, "d", "./", " set logic config file path")
+	flag.StringVar(&confPath, "d", "./", " set comet config file path")
 }
 
 type Config struct {
-	Base         BaseConf        `mapstructure:"base"`
-	Websocket    WebsocketConf   `mapstructure:"websocket"`
-	Bucket       BucketConf      `mapstructure:"bucket"`
-	RpcPushAdds  []RpcPushAddrs  `mapstructure:"rpcPushAddrs"`
+	Base          BaseConf        `mapstructure:"base"`
+	Websocket     WebsocketConf   `mapstructure:"websocket"`
+	Bucket        BucketConf      `mapstructure:"bucket"`
+	RpcPushAdds   []RpcPushAddrs  `mapstructure:"rpcPushAddrs"`
 	RpcLogicAddrs []RpcLogicAddrs `mapstructure:"rpcLogicAddrs"`
 }
 
@@ -38,7 +38,7 @@ type RpcLogicAddrs struct {
 
 // 基础的配置信息
 type BaseConf struct {
-	Pidfile         string   `mapstructure:"pidfile"`
+	Pidfile         string `mapstructure:"pidfile"`
 	ServerId        int8   `mapstructure:"serverId"`
 	MaxProc         int
 	PprofBind       []string `mapstructure:"pprofBind"` // 性能监控的域名端口
@@ -50,17 +50,17 @@ type BaseConf struct {
 	BroadcastSize   int
 	ReadBufferSize  int
 	WriteBufferSize int
-	CertPath       string  `mapstructure:"certPath"`
-	KeyPath        string  `mapstructure:"keyPath"`
+	CertPath        string `mapstructure:"certPath"`
+	KeyPath         string `mapstructure:"keyPath"`
 }
 
 type BucketConf struct {
-	Num      int `mapstructure:"num"`
-	Channel  int `mapstructure:"channel"`
-	Room     int `mapstructure:"room"`
-	SvrProto int `mapstructure:"svrProto"`
+	Num           int    `mapstructure:"num"`
+	Channel       int    `mapstructure:"channel"`
+	Room          int    `mapstructure:"room"`
+	SvrProto      int    `mapstructure:"svrProto"`
 	RoutineAmount uint64 `mapstructure:"routineAmount"`
-	RoutineSize int `mapstructure:"routineSize"`
+	RoutineSize   int    `mapstructure:"routineSize"`
 }
 
 type WebsocketConf struct {
@@ -88,7 +88,6 @@ func NewConfig() *Config {
 	return &Config{
 		Base: BaseConf{
 			Pidfile:         "/tmp/comet.pid",
-			Logfile:         "/Users/AT/go/src/im/logs/comet/comet.log",
 			MaxProc:         runtime.NumCPU(),
 			PprofBind:       []string{"localhost:6911"},
 			WriteWait:       10 * time.Second,
@@ -100,12 +99,12 @@ func NewConfig() *Config {
 			BroadcastSize:   512,
 		},
 		Bucket: BucketConf{
-			Num:      8,
-			Channel:  1024,
-			Room:     1024,
-			SvrProto: 80,
+			Num:           8,
+			Channel:       1024,
+			Room:          1024,
+			SvrProto:      80,
 			RoutineAmount: 32,
-			RoutineSize: 20,
+			RoutineSize:   20,
 		},
 		Websocket: WebsocketConf{
 			Bind: ":7911",
