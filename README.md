@@ -47,10 +47,15 @@ mv net $GOPATH/src/golang.org/x/
 安装comet、logic、job模块
 ```
 cd $GOPATH/src/im/comet
+mv comet.toml.example comet.toml
 go install
+
 cd ../logic/
+mv logic.toml.example logic.toml
 go install
+
 cd ../job
+mv job.toml.example job.toml
 go install
 
 nohup $GOPATH/bin/logic -d $GOPATH/src/im/logic/ 2>&1 > /data/log/im/logic.log &

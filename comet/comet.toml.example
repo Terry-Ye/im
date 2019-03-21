@@ -1,6 +1,5 @@
 [base]
 pidfile = "/tmp/comet.pid"
-logfile = "/comet/comet.log"
 serverId = 1
 certPath = ""
 keyPath = ""

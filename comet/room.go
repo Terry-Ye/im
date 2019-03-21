@@ -1,16 +1,16 @@
 package main
 
 import (
-	"sync"
 	"im/libs/proto"
+	"sync"
 )
 
 type Room struct {
 	Id     int32 // 房间号
 	rlock  sync.RWMutex
 	next   *Channel // 该房间的所有客户端的Channel
-	drop   bool // 标示房间是否存活
-	Online int  // 在线用户数量
+	drop   bool     // 标示房间是否存活
+	Online int      // 在线用户数量
 }
 
 func NewRoom(Id int32) (r *Room) {
@@ -32,7 +32,7 @@ func (r *Room) Put(ch *Channel) (err error) {
 		ch.Prev = nil
 		r.next = ch
 		r.Online++
-	}else {
+	} else {
 		err = ErrRoomDroped
 	}
 	return
@@ -40,16 +40,14 @@ func (r *Room) Put(ch *Channel) (err error) {
 
 func (r *Room) Push(p *proto.Proto) {
 	r.rlock.RLock()
-	for ch := r.next; ch != nil; ch = ch.Next{
+	for ch := r.next; ch != nil; ch = ch.Next {
 		// log.Infof("Room Push info %v", p)
 		ch.Push(p)
 	}
 
-
 	r.rlock.RUnlock()
 	return
 }
-
 
 func (r *Room) Del(ch *Channel) bool {
 	r.rlock.RLock()
@@ -61,7 +59,7 @@ func (r *Room) Del(ch *Channel) bool {
 	if ch.Prev != nil {
 		// if not header
 		ch.Prev.Next = ch.Next
-	}else {
+	} else {
 		r.next = ch.Next
 	}
 	r.Online--

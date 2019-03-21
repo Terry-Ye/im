@@ -2,8 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
-
 	log "github.com/sirupsen/logrus"
 	"im/libs/perf"
 	"runtime"
@@ -18,13 +16,11 @@ func main() {
 	flag.Parse()
 
 	if err := InitConfig(); err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		log.Panicf("Fatal error config file: %s \n", err)
 	}
 	// 设置cpu 核数
 	runtime.GOMAXPROCS(Conf.Base.MaxProc)
-	// 使用logrus包
 
-	// log.Info("111 noteworthy happened!")
 	// 加入性能监控
 	perf.Init(Conf.Base.PprofBind)
 
@@ -38,10 +34,10 @@ func main() {
 
 	for i := 0; i < Conf.Bucket.Num; i++ {
 		Buckets[i] = NewBucket(BucketOptions{
-			ChannelSize: Conf.Bucket.Channel,
-			RoomSize:    Conf.Bucket.Room,
+			ChannelSize:   Conf.Bucket.Channel,
+			RoomSize:      Conf.Bucket.Room,
 			RoutineAmount: Conf.Bucket.RoutineAmount,
-			RoutineSize: Conf.Bucket.RoutineSize,
+			RoutineSize:   Conf.Bucket.RoutineSize,
 		})
 	}
 	operator := new(DefaultOperator)
@@ -57,20 +53,22 @@ func main() {
 
 	log.Info("start InitPushRpc")
 	if err := InitPushRpc(Conf.RpcPushAdds); err != nil {
-		log.Fatal(err)
+		log.Panicf("InitPushRpc Fatal error: %s \n", err)
+
 	}
+	/**
+	ws
+	*/
 	// if err := InitWebsocket(Conf.Websocket.Bind); err != nil {
-	// 	log.Fatal(err)
+	//	log.Panicf("InitWebsocket() error:  %s \n", err)
 	// }
 
+	/**
+	wss
+	You need to configure certPath and keyPath in comet.toml.
+	*/
 	if err := InitWebsocketWss(Conf.Websocket.Bind); err != nil {
-		log.Fatal(err)
+		log.Panicf("Please check the certPath and keyPath of wss or other, error:  %s \n", err)
 	}
-
-
-
-
-
-
 
 }
