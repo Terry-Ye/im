@@ -18,10 +18,10 @@ var (
 	RpcClientList  map[int8]client.XClient
 )
 
-func InitComets(cometConf []CometConf) (err error) {
-	RpcClientList = make(map[int8]client.XClient, len(cometConf))
+func InitComets() (err error) {
 
 	d := client.NewZookeeperDiscovery("/im_logic_rpc_server", define.RPC_COMET_SERVER_PATH, []string{"127.0.0.1:2181"}, nil)
+	RpcClientList = make(map[int8]client.XClient, len(d.GetServices()))
 	// Get comet service configuration from zookeeper
 	for _, cometConf := range d.GetServices() {
 

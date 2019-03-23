@@ -37,7 +37,7 @@ func createServer(network string, addr string) {
 
 	s := server.NewServer()
 	addRegistryPlugin(s)
-	s.RegisterName(define.RPC_LOGIC_SERVER_PATH, new(LogicRpc), "serverId=1")
+	s.RegisterName(define.RPC_LOGIC_SERVER_PATH, new(LogicRpc), "1")
 	s.Serve(network, addr)
 
 }

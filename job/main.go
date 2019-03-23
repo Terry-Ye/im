@@ -22,7 +22,7 @@ func main() {
 	}
 
 	// 通过rpc初始化comet对应的 server bucket等
-	if err := InitComets(Conf.CometConf); err != nil {
+	if err := InitComets(); err != nil {
 		log.Panicf("InitRPC() fatal error :  %s \n", err)
 	}
 
