@@ -4,7 +4,6 @@ import (
 	"context"
 	log "github.com/sirupsen/logrus"
 	"github.com/smallnest/rpcx/client"
-	"im/libs/define"
 	"im/libs/proto"
 )
 
@@ -12,12 +11,13 @@ var (
 	logicRpcClient client.XClient
 )
 
-func InitLogicRpc(rpcLogicAddrs []RpcLogicAddrs) (err error) {
+func InitLogicRpcClient() (err error) {
 
-	d := client.NewZookeeperDiscovery("/im_logic_rpc_server", define.RPC_LOGIC_SERVER_PATH, []string{"127.0.0.1:2181"}, nil)
-
-	logicRpcClient = client.NewXClient(define.RPC_LOGIC_SERVER_PATH, client.Failtry, client.RandomSelect, d, client.DefaultOption)
-
+	d := client.NewZookeeperDiscovery(Conf.ZookeeperInfo.BasePath,
+		Conf.ZookeeperInfo.ServerPathLogic,
+		[]string{Conf.ZookeeperInfo.Host},
+		nil)
+	logicRpcClient = client.NewXClient(Conf.ZookeeperInfo.ServerPathLogic, client.Failtry, client.RandomSelect, d, client.DefaultOption)
 	return
 }
 

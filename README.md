@@ -26,7 +26,7 @@ go get -u github.com/Terry-Ye/im
 mv $GOPATH/src/github.com/Terry-Ye/im $GOPATH/src/im
 cd $GOPATH/src/im
 go get ./...
-# 需要使用zookeeper服务
+# 需要使用zookeeper服务 文档最底有安装启动方法
 go get -u -v -tags "zookeeper" github.com/smallnest/rpcx/...
 
 
@@ -95,6 +95,18 @@ go run main.go
 * rpc: github.com/smallnest/rpcx
 * websocket: github.com/gorilla/websocket
 * 配置文件：github.com/spf13/viper
+
+
+### zookeeper 安装
+```
+    wget http://mirrors.hust.edu.cn/apache/zookeeper/stable/zookeeper-3.4.12.tar.gz
+    tar -zxvf zookeeper-3.4.12.tar.gz
+    cd zookeeper-3.4.12/conf/
+    mv zoo_sample.cfg zoo.cfg //更改默认配置文件名称
+    vi zoo.cfg //编辑配置文件，自定义dataDir
+    cd ../bin
+    ./zkServer.sh start //启动
+```
 
 ### 后续计划
 1. 监控

@@ -1,12 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"github.com/go-redis/redis"
 	log "github.com/sirupsen/logrus"
 	"im/libs/define"
 	"im/libs/proto"
-	"encoding/json"
-	"bytes"
 )
 
 var (
@@ -15,9 +15,9 @@ var (
 
 func InitRedis() (err error) {
 	RedisCli = redis.NewClient(&redis.Options{
-		Addr:     Conf.Base.RedisAddr,
-		Password: Conf.Base.RedisPw,        // no password set
-		DB:       Conf.Base.RedisDefaultDB, // use default DB
+		Addr:     Conf.Redis.RedisAddr,
+		Password: Conf.Redis.RedisPw,        // no password set
+		DB:       Conf.Redis.RedisDefaultDB, // use default DB
 	})
 	if pong, err := RedisCli.Ping().Result(); err != nil {
 		log.Infof("RedisCli Ping Result pong: %s,  err: %s", pong, err)
@@ -29,10 +29,10 @@ func InitRedis() (err error) {
 // 发布订阅消息
 func RedisPublishCh(serverId int8, uid string, msg []byte) (err error) {
 	var redisMsg = &proto.RedisMsg{
-		Op: define.OP_SINGLE_SEND,
+		Op:       define.OP_SINGLE_SEND,
 		ServerId: serverId,
-		UserId: uid,
-		Msg: msg,
+		UserId:   uid,
+		Msg:      msg,
 	}
 
 	redisMsgStr, err := json.Marshal(redisMsg)
@@ -46,9 +46,9 @@ func RedisPublishCh(serverId int8, uid string, msg []byte) (err error) {
 // 发布到房间
 func RedisPublishRoom(rid int32, msg []byte) (err error) {
 	var redisMsg = &proto.RedisMsg{
-		Op: define.OP_ROOM_SEND,
+		Op:     define.OP_ROOM_SEND,
 		RoomId: rid,
-		Msg: msg,
+		Msg:    msg,
 	}
 	redisMsgStr, err := json.Marshal(redisMsg)
 	log.Infof("RedisPublishRoom redisMsg info : %s", redisMsgStr)
@@ -56,14 +56,11 @@ func RedisPublishRoom(rid int32, msg []byte) (err error) {
 	return
 }
 
-
-
-
- func RedisPublishRoomCount(rid int32, count int) (err error) {
+func RedisPublishRoomCount(rid int32, count int) (err error) {
 	var redisMsg = &proto.RedisRoomCount{
-		Op: define.OP_ROOM_COUNT_SEND,
+		Op:     define.OP_ROOM_COUNT_SEND,
 		RoomId: rid,
-		Count: count,
+		Count:  count,
 	}
 	redisMsgStr, err := json.Marshal(redisMsg)
 	log.Infof("RedisPublishRoomCount redisMsg info : %s", redisMsgStr)
@@ -71,14 +68,13 @@ func RedisPublishRoom(rid int32, msg []byte) (err error) {
 	return
 }
 
-
 func RedisPublishRoomInfo(rid int32, count int, RoomUserInfo map[string]string) (err error) {
 	// , roomUserList []
 	var redisMsg = &proto.RedisRoomInfo{
-		Op: define.OP_ROOM_INFO_SEND,
-		RoomId: rid,
-		Count: count,
-		RoomUserInfo:RoomUserInfo,
+		Op:           define.OP_ROOM_INFO_SEND,
+		RoomId:       rid,
+		Count:        count,
+		RoomUserInfo: RoomUserInfo,
 	}
 	redisMsgByte, err := json.Marshal(redisMsg)
 	log.Infof("RedisPublishRoomInfo redisMsg info : %s", redisMsgByte)
@@ -87,15 +83,15 @@ func RedisPublishRoomInfo(rid int32, count int, RoomUserInfo map[string]string) 
 }
 
 /**
-	减少指定在线用户信息(暂未用到)
- */
+减少指定在线用户信息(暂未用到)
+*/
 func RedisPublishRoomUserLess(rid int32, count int, RoomUserInfo map[string]string) (err error) {
 	// , roomUserList []
 	var redisMsg = &proto.RedisRoomInfo{
-		Op: define.OP_ROOM_INFO_SEND,
-		RoomId: rid,
-		Count: count,
-		RoomUserInfo:RoomUserInfo,
+		Op:           define.OP_ROOM_INFO_SEND,
+		RoomId:       rid,
+		Count:        count,
+		RoomUserInfo: RoomUserInfo,
 	}
 	redisMsgByte, err := json.Marshal(redisMsg)
 	log.Infof("RedisPublishRoomInfo redisMsg info : %s", redisMsgByte)
@@ -103,8 +99,7 @@ func RedisPublishRoomUserLess(rid int32, count int, RoomUserInfo map[string]stri
 	return
 }
 
-
-func getKey(key string) (string){
+func getKey(key string) string {
 
 	var returnKey bytes.Buffer
 	returnKey.WriteString(define.REDIS_PREFIX)
@@ -112,7 +107,7 @@ func getKey(key string) (string){
 	return returnKey.String()
 }
 
-func getRoomUserKey(key string) (string){
+func getRoomUserKey(key string) string {
 
 	var returnKey bytes.Buffer
 	returnKey.WriteString(define.REDIS_ROOM_USER_PREFIX)

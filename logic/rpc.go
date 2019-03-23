@@ -36,17 +36,18 @@ func InitRPC() (err error) {
 func createServer(network string, addr string) {
 
 	s := server.NewServer()
-	addRegistryPlugin(s)
-	s.RegisterName(define.RPC_LOGIC_SERVER_PATH, new(LogicRpc), "1")
+	addRegistryPlugin(s, network, addr)
+	// serverId must be unique
+	s.RegisterName(define.RPC_LOGIC_SERVER_PATH, new(LogicRpc), Conf.ZookeeperInfo.ServerId)
 	s.Serve(network, addr)
 
 }
 
-func addRegistryPlugin(s *server.Server) {
+func addRegistryPlugin(s *server.Server, network string, addr string) {
 	r := &serverplugin.ZooKeeperRegisterPlugin{
-		ServiceAddress:   "tcp@127.0.0.1:6923",
-		ZooKeeperServers: []string{"127.0.0.1:2181"},
-		BasePath:         "/im_logic_rpc_server",
+		ServiceAddress:   network + "@" + addr,
+		ZooKeeperServers: []string{Conf.ZookeeperInfo.Host},
+		BasePath:         Conf.ZookeeperInfo.BasePath,
 		Metrics:          metrics.NewRegistry(),
 		UpdateInterval:   time.Minute,
 	}

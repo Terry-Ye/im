@@ -28,23 +28,23 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "home.html")
 }
 
-func InitWebsocket(bind string) (err error) {
+func InitWebsocket() (err error) {
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(DefaultServer, w, r)
 	})
 
-	err = http.ListenAndServe(bind, nil)
+	err = http.ListenAndServe(Conf.Websocket.Bind, nil)
 	return err
 }
 
-func InitWebsocketWss(bind string) (err error) {
+func InitWebsocketWss() (err error) {
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(DefaultServer, w, r)
 	})
 
-	err = http.ListenAndServeTLS(bind, Conf.Base.CertPath, Conf.Base.KeyPath, nil)
+	err = http.ListenAndServeTLS(Conf.Websocket.Bind, Conf.Base.CertPath, Conf.Base.KeyPath, nil)
 	return err
 }
 

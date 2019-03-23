@@ -18,23 +18,34 @@ func init() {
 }
 
 type Config struct {
-	Base BaseConf `mapstructure:"base"`
+	Base          BaseConf  `mapstructure:"base"`
+	ZookeeperInfo Zookeeper `mapstructure:"zookeeper"`
+	Redis         Redis     `mapstructure:"redis"`
 	// CometConf []CometConf `mapstructure:"cometsAddrs"`
 	// Bucket BucketConf `mapstructure:"bucket"`
 }
 
-// 基础的配置信息
-type BaseConf struct {
-	Pidfile    string `mapstructure:"pidfile"`
-	MaxProc    int
-	PprofAddrs []string `mapstructure:"pprofBind"` //
+type Zookeeper struct {
+	Host            string `mapstructure:"host"`
+	BasePath        string `mapstructure:"basePath"`
+	ServerPathComet string `mapstructure:"serverPathComet"`
+	ServerId        string `mapstructure:"ServerId"`
+}
 
-	RedisAddr      string `mapstructure:"redisAddr"` //
+type Redis struct {
+	RedisAddr      string `mapstructure:"RedisAddr"` //
 	RedisPw        string `mapstructure:"redisPw"`
 	RedisDefaultDB int    `mapstructure:"redisDefaultDB"`
-	PushChan       int    `mapstructure:"pushChan"`
-	PushChanSize   int    `mapstructure:"pushChanSize"`
-	IsDebug        bool
+}
+
+// 基础的配置信息
+type BaseConf struct {
+	Pidfile      string `mapstructure:"pidfile"`
+	MaxProc      int
+	PprofAddrs   []string `mapstructure:"pprofBind"` //
+	PushChan     int      `mapstructure:"pushChan"`
+	PushChanSize int      `mapstructure:"pushChanSize"`
+	IsDebug      bool
 }
 
 // type CometConf struct {
@@ -62,15 +73,12 @@ func InitConfig() (err error) {
 func NewConfig() *Config {
 	return &Config{
 		Base: BaseConf{
-			Pidfile:        "/tmp/job.pid",
-			MaxProc:        runtime.NumCPU(),
-			PprofAddrs:     []string{"localhost:6922"},
-			RedisAddr:      "127.0.0.1:6379",
-			RedisPw:        "",
-			RedisDefaultDB: 0,
-			PushChan:       2,
-			PushChanSize:   50,
-			IsDebug:        true,
+			Pidfile:      "/tmp/job.pid",
+			MaxProc:      runtime.NumCPU(),
+			PprofAddrs:   []string{"localhost:6922"},
+			PushChan:     2,
+			PushChanSize: 50,
+			IsDebug:      true,
 		},
 		// CometConf: []CometConf{
 		// 	{Key: 1, Addr: "tcp@0.0.0.0:6912"},

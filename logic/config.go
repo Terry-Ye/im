@@ -19,8 +19,21 @@ func init() {
 }
 
 type Config struct {
-	Base BaseConf `mapstructure:"base"`
+	Base          BaseConf  `mapstructure:"base"`
+	ZookeeperInfo Zookeeper `mapstructure:"zookeeper"`
+	Redis         Redis     `mapstructure:"redis"`
 	// Bucket BucketConf `mapstructure:"bucket"`
+}
+type Zookeeper struct {
+	Host     string `mapstructure:"host"`
+	BasePath string `mapstructure:"basePath"`
+	ServerId string `mapstructure:"ServerId"`
+}
+
+type Redis struct {
+	RedisAddr      string `mapstructure:"RedisAddr"` //
+	RedisPw        string `mapstructure:"redisPw"`
+	RedisDefaultDB int    `mapstructure:"redisDefaultDB"`
 }
 
 // 基础的配置信息
@@ -29,10 +42,7 @@ type BaseConf struct {
 	MaxProc          int
 	PprofAddrs       []string      `mapstructure:"pprofBind"` //
 	HttpAddrs        []string      `mapstructure:"httpAddr"`  //
-	RedisAddr        string        `mapstructure:"RedisAddr"` //
-	RedisPw          string        `mapstructure:"redisPw"`
-	RedisDefaultDB   int           `mapstructure:"redisDefaultDB"`
-	RPCAddrs         []string      `mapstructure:"RPCAddrs"` //
+	RPCAddrs         []string      `mapstructure:"RPCAddrs"`  //
 	HTTPReadTimeout  time.Duration `mapstructure:"HTTPReadTimeout"`
 	HTTPWriteTimeout time.Duration `mapstructure:"HTTPWriteTimeout"`
 	CertPath         string        `mapstructure:"certPath"`
@@ -63,9 +73,6 @@ func NewConfig() *Config {
 			MaxProc:          runtime.NumCPU(),
 			PprofAddrs:       []string{"localhost:6922"},
 			HttpAddrs:        []string{"tcp@0.0.0.0:6921"},
-			RedisAddr:        "127.0.0.1:6379",
-			RedisPw:          "",
-			RedisDefaultDB:   0,
 			RPCAddrs:         []string{"tcp@localhost:6923"},
 			HTTPReadTimeout:  10 * time.Second,
 			HTTPWriteTimeout: 20 * time.Second,

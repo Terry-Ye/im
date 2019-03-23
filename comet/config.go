@@ -22,14 +22,22 @@ type Config struct {
 	Base          BaseConf        `mapstructure:"base"`
 	Websocket     WebsocketConf   `mapstructure:"websocket"`
 	Bucket        BucketConf      `mapstructure:"bucket"`
-	RpcPushAdds   []RpcPushAddrs  `mapstructure:"rpcPushAddrs"`
 	RpcLogicAddrs []RpcLogicAddrs `mapstructure:"rpcLogicAddrs"`
+	ZookeeperInfo Zookeeper       `mapstructure:"zookeeper"`
 }
 
-type RpcPushAddrs struct {
-	Key  int8   `mapstructure:"key"`
-	Addr string `mapstructure:"addr"`
+type Zookeeper struct {
+	Host            string `mapstructure:"host"`
+	BasePath        string `mapstructure:"basePath"`
+	ServerPathLogic string `mapstructure:"serverPathLogic"`
+	ServerId        string `mapstructure:"ServerId"`
+	ServerPathComet string `mapstructure:"serverPathComet"`
 }
+
+// type RpcPushAddrs struct {
+// 	Key  int8   `mapstructure:"key"`
+// 	Addr string `mapstructure:"addr"`
+// }
 
 type RpcLogicAddrs struct {
 	Key  int8   `mapstructure:"key"`

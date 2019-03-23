@@ -29,8 +29,6 @@ func main() {
 	InitPush()
 	select {}
 
-	// log.Info("111 noteworthy happened!")
-
 	// 加入监控 后补
 
 }

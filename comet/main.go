@@ -24,7 +24,7 @@ func main() {
 	// 加入性能监控
 	perf.Init(Conf.Base.PprofBind)
 
-	if err := InitLogicRpc(Conf.RpcLogicAddrs); err != nil {
+	if err := InitLogicRpcClient(); err != nil {
 
 		log.Panicf("InitLogicRpc Fatal error: %s \n", err)
 	}
@@ -52,13 +52,13 @@ func main() {
 	})
 
 	log.Info("start InitPushRpc")
-	if err := InitPushRpc(Conf.RpcPushAdds); err != nil {
+	if err := InitLogicRpcServer(); err != nil {
 		log.Panicf("InitPushRpc Fatal error: %s \n", err)
 	}
 	/**
 	ws
 	*/
-	if err := InitWebsocket(Conf.Websocket.Bind); err != nil {
+	if err := InitWebsocket(); err != nil {
 		log.Panicf("InitWebsocket() error:  %s \n", err)
 	}
 
@@ -66,7 +66,7 @@ func main() {
 	wss
 	You need to configure certPath and keyPath in comet.toml.
 	*/
-	// if err := InitWebsocketWss(Conf.Websocket.Bind); err != nil {
+	// if err := InitWebsocketWss(); err != nil {
 	// 	log.Panicf("Please check the certPath and keyPath of wss or other, error:  %s \n", err)
 	// }
 

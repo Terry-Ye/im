@@ -20,7 +20,7 @@ var (
 
 func InitComets() (err error) {
 
-	d := client.NewZookeeperDiscovery("/im_logic_rpc_server", define.RPC_COMET_SERVER_PATH, []string{"127.0.0.1:2181"}, nil)
+	d := client.NewZookeeperDiscovery(Conf.ZookeeperInfo.BasePath, define.RPC_COMET_SERVER_PATH, []string{Conf.ZookeeperInfo.Host}, nil)
 	RpcClientList = make(map[int8]client.XClient, len(d.GetServices()))
 	// Get comet service configuration from zookeeper
 	for _, cometConf := range d.GetServices() {
@@ -32,11 +32,11 @@ func InitComets() (err error) {
 			log.Panicf("InitComets err，Can't find serverId. error: %s", error)
 		}
 		d := client.NewPeer2PeerDiscovery(cometConf.Key, "")
-		RpcClientList[int8(serverId)] = client.NewXClient(define.RPC_COMET_SERVER_PATH, client.Failtry, client.RandomSelect, d, client.DefaultOption)
+		RpcClientList[int8(serverId)] = client.NewXClient(Conf.ZookeeperInfo.ServerPathComet, client.Failtry, client.RandomSelect, d, client.DefaultOption)
 		log.Infof("RpcClientList addr %s, v %v", cometConf.Key, RpcClientList[int8(serverId)])
 
 	}
-	logicRpcClient = client.NewXClient(define.RPC_COMET_SERVER_PATH, client.Failtry, client.RandomSelect, d, client.DefaultOption)
+	logicRpcClient = client.NewXClient(Conf.ZookeeperInfo.ServerPathComet, client.Failtry, client.RandomSelect, d, client.DefaultOption)
 
 	return
 }

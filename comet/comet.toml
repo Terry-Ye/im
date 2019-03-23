@@ -1,19 +1,21 @@
 [base]
 pidfile = "/tmp/comet.pid"
 serverId = 1
-certPath = "/etc/letsencrypt/live/texixi.com-0002/fullchain.pem"
-keyPath = "/etc/letsencrypt/live/texixi.com-0002/privkey.pem"
+certPath = ""
+keyPath = ""
 
 
 [websocket]
 bind = "0.0.0.0:8911"
 
+[zookeeper]
+host = "127.0.0.1:2181"
+basePath = "/im_logic_rpc_server"
+serverPathLogic = "LogicRpc"
+serverPathComet = "CometRpc"
+ServerId = "1"
 
 [[rpcLogicAddrs]]
-key = 1
-addr = "tcp@0.0.0.0:6923"
-
-[[rpcPushAddrs]]
 key = 1
 addr = "tcp@0.0.0.0:6912"
 
