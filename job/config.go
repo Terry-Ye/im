@@ -1,9 +1,9 @@
 package main
 
 import (
-	"runtime"
 	"flag"
 	"github.com/spf13/viper"
+	"runtime"
 	// "github.com/go-redis/redis"
 	"fmt"
 )
@@ -18,14 +18,14 @@ func init() {
 }
 
 type Config struct {
-	Base      BaseConf    `mapstructure:"base"`
-	CometConf []CometConf `mapstructure:"cometsAddrs"`
+	Base BaseConf `mapstructure:"base"`
+	// CometConf []CometConf `mapstructure:"cometsAddrs"`
 	// Bucket BucketConf `mapstructure:"bucket"`
 }
 
 // 基础的配置信息
 type BaseConf struct {
-	Pidfile    string   `mapstructure:"pidfile"`
+	Pidfile    string `mapstructure:"pidfile"`
 	MaxProc    int
 	PprofAddrs []string `mapstructure:"pprofBind"` //
 
@@ -34,12 +34,13 @@ type BaseConf struct {
 	RedisDefaultDB int    `mapstructure:"redisDefaultDB"`
 	PushChan       int    `mapstructure:"pushChan"`
 	PushChanSize   int    `mapstructure:"pushChanSize"`
-	IsDebug		bool
+	IsDebug        bool
 }
-type CometConf struct {
-	Key  int8   `mapstructure:"key"`
-	Addr string `mapstructure:"addr"`
-}
+
+// type CometConf struct {
+// 	Key  int8   `mapstructure:"key"`
+// 	Addr string `mapstructure:"addr"`
+// }
 
 func InitConfig() (err error) {
 	Conf = NewConfig()
@@ -69,15 +70,10 @@ func NewConfig() *Config {
 			RedisDefaultDB: 0,
 			PushChan:       2,
 			PushChanSize:   50,
-			IsDebug: true,
+			IsDebug:        true,
 		},
-		CometConf: []CometConf{
-			{Key: 1, Addr: "tcp@0.0.0.0:6912"},
-		},
+		// CometConf: []CometConf{
+		// 	{Key: 1, Addr: "tcp@0.0.0.0:6912"},
+		// },
 	}
 }
-
-// 重新加载配置
-// func ReloadConfig() {
-//
-// }

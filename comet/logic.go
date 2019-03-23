@@ -13,29 +13,10 @@ var (
 )
 
 func InitLogicRpc(rpcLogicAddrs []RpcLogicAddrs) (err error) {
-	// LogicAddrs := make([]*client.KVPair, len(rpcLogicAddrs))
-	// for i, bind := range rpcLogicAddrs {
-	//
-	// 	b := new(client.KVPair)
-	// 	b.Key = bind.Addr
-	// 	LogicAddrs[i] = b
-	//
-	// }
-
-	// xclient := client.NewZookeeperDiscovery("/im_logic_rpc_server", define.RPC_LOGIC_SERVER_PATH, []string{"127.0.0.1:2181"}, nil)
-	//
-	// // xclient := client.NewXClient("Arith", client.Failtry, client.RandomSelect, d, client.DefaultOption)
-	// defer xclient.Close()
-	//
-	// d := client.NewMultipleServersDiscovery(LogicAddrs)
-	//
-	// logicRpcClient = client.NewXClient(define.RPC_LOGIC_SERVER_PATH, client.Failover, client.RoundRobin, d, client.DefaultOption)
 
 	d := client.NewZookeeperDiscovery("/im_logic_rpc_server", define.RPC_LOGIC_SERVER_PATH, []string{"127.0.0.1:2181"}, nil)
 
 	logicRpcClient = client.NewXClient(define.RPC_LOGIC_SERVER_PATH, client.Failtry, client.RandomSelect, d, client.DefaultOption)
-
-	// defer logicRpcClient.Close()
 
 	return
 }

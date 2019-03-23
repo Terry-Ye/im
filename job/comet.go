@@ -7,36 +7,36 @@ import (
 	"github.com/smallnest/rpcx/client"
 	"im/libs/define"
 	"im/libs/proto"
+	"strconv"
+	"strings"
 )
 
-type CometRpc int
+// type CometRpc int
 
 var (
 	logicRpcClient client.XClient
 	RpcClientList  map[int8]client.XClient
-	// RpcClientList map[int8]client.XClient
-
 )
 
 func InitComets(cometConf []CometConf) (err error) {
-	LogicAddrs := make([]*client.KVPair, len(cometConf))
 	RpcClientList = make(map[int8]client.XClient, len(cometConf))
 
-	for i, bind := range cometConf {
-		// log.Infof("bind key %d", bind.Key)
-		b := new(client.KVPair)
-		b.Key = bind.Addr
-		// 需要转int 类型
-		LogicAddrs[i] = b
-		d := client.NewPeer2PeerDiscovery(bind.Addr, "")
-		RpcClientList[bind.Key] = client.NewXClient(define.RPC_COMET_SERVER_PATH, client.Failtry, client.RandomSelect, d, client.DefaultOption)
+	d := client.NewZookeeperDiscovery("/im_logic_rpc_server", define.RPC_COMET_SERVER_PATH, []string{"127.0.0.1:2181"}, nil)
+	// Get comet service configuration from zookeeper
+	for _, cometConf := range d.GetServices() {
 
-		log.Infof("RpcClientList addr %s, v %v", bind.Addr, RpcClientList[bind.Key])
+		cometConf.Value = strings.Replace(cometConf.Value, "=&tps=0", "", 1)
+
+		serverId, error := strconv.ParseInt(cometConf.Value, 10, 8)
+		if error != nil {
+			log.Panicf("InitComets err，Can't find serverId. error: %s", error)
+		}
+		d := client.NewPeer2PeerDiscovery(cometConf.Key, "")
+		RpcClientList[int8(serverId)] = client.NewXClient(define.RPC_COMET_SERVER_PATH, client.Failtry, client.RandomSelect, d, client.DefaultOption)
+		log.Infof("RpcClientList addr %s, v %v", cometConf.Key, RpcClientList[int8(serverId)])
 
 	}
-
-	// d := client.NewZookeeperDiscovery("/im_logic_rpc_server", define.RPC_COMET_SERVER_PATH, []string{"127.0.0.1:2181"}, nil)
-	// logicRpcClient = client.NewXClient(define.RPC_COMET_SERVER_PATH, client.Failtry, client.RandomSelect, d, client.DefaultOption)
+	logicRpcClient = client.NewXClient(define.RPC_COMET_SERVER_PATH, client.Failtry, client.RandomSelect, d, client.DefaultOption)
 
 	return
 }
