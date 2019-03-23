@@ -33,8 +33,6 @@ go get -u -v -tags "zookeeper" github.com/smallnest/rpcx/...
 
 ```
 
-[安装zookeeper文档](https://www.texixi.com/2019/03/22/Terry-Ye-im-%E9%A1%B9%E7%9B%AE%E4%BD%BF%E7%94%A8zookeeper%E6%96%87%E6%A1%A3/)
-
 golang.org 包拉不下来的情况，例
 ```
 package golang.org/x/net/ipv4: unrecognized import path "golang.org/x/net/ipv4" (https fetch: Get https://golang.org/x/net/ipv4?go-get=1: dial tcp 216.239.37.1:443: i/o timeout)

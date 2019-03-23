@@ -20,7 +20,7 @@ var (
 
 func InitComets() (err error) {
 
-	d := client.NewZookeeperDiscovery(Conf.ZookeeperInfo.BasePath, define.RPC_COMET_SERVER_PATH, []string{Conf.ZookeeperInfo.Host}, nil)
+	d := client.NewZookeeperDiscovery(Conf.ZookeeperInfo.BasePath, Conf.ZookeeperInfo.ServerPathComet, []string{Conf.ZookeeperInfo.Host}, nil)
 	RpcClientList = make(map[int8]client.XClient, len(d.GetServices()))
 	// Get comet service configuration from zookeeper
 	for _, cometConf := range d.GetServices() {
