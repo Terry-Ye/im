@@ -38,7 +38,7 @@ func createServer(network string, addr string) {
 	s := server.NewServer()
 	addRegistryPlugin(s, network, addr)
 	// serverId must be unique
-	s.RegisterName(define.RPC_LOGIC_SERVER_PATH, new(LogicRpc), Conf.ZookeeperInfo.ServerId)
+	s.RegisterName(Conf.ZookeeperInfo.ServerPathLogic, new(LogicRpc), Conf.ZookeeperInfo.ServerId)
 	s.Serve(network, addr)
 
 }

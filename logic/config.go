@@ -25,9 +25,10 @@ type Config struct {
 	// Bucket BucketConf `mapstructure:"bucket"`
 }
 type Zookeeper struct {
-	Host     string `mapstructure:"host"`
-	BasePath string `mapstructure:"basePath"`
-	ServerId string `mapstructure:"ServerId"`
+	Host            string `mapstructure:"host"`
+	BasePath        string `mapstructure:"basePath"`
+	ServerId        string `mapstructure:"serverId"`
+	ServerPathLogic string `mapstructure:"serverPathLogic"`
 }
 
 type Redis struct {
