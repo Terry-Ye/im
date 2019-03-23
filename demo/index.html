@@ -15,7 +15,7 @@
             <img src="./static/9302457.jpeg" alt="头像" id="avatar">
             <!--a href="./roomManage.html" id="nickName">匿名</a-->
             <span id="nickName"></span>
-            <a href="https://www.texixi.com:1999/login.html" id="chatroom-login" style="display: none;">登录</a>
+            <a href="http://localhost:1999/login.html" id="chatroom-login" style="display: none;">登录</a>
             <a  id="chatroom-logout"  onclick="logout()">注销</a>
         </div>
 
@@ -43,9 +43,9 @@
                 直播公告
             </div>
             <div class="announcement" id="roomAnnouncement"><a href="https://github.com/Terry-Ye/im ">中文文档地址</a></div>
-           <ul class="tab">
+            <ul class="tab">
                 <li class="crt j-tab" data-value="chat" id="tab_chat" onclick="changeTab('chat')">直播互动</li>
-               <li class="j-tab" data-value="member"  id="tab_member"  onclick="changeTab('member')">在线成员</li>
+                <li class="j-tab" data-value="member"  id="tab_member"  onclick="changeTab('member')">在线成员</li>
 
             </ul>
             <div class="chat j-pannel j-chat" id="msg">
@@ -78,7 +78,7 @@
             <div id="chatroom-anonymous" >
                 <em class="loginWarn">登录后方可发送消息</em>
                 <div class="loginBtn">
-                    <a href="https://www.texixi.com:1999/register.html" class="u-btn btn">登录注册聊天室</a>
+                    <a href="http://localhost:1999/register.html" class="u-btn btn">登录注册聊天室</a>
                 </div>
             </div>
 
@@ -90,7 +90,7 @@
 <script src="js/jquery.min.js?v=2.1.4"></script>
 <script type="text/javascript">
 
-    var websocket = new WebSocket("wss://www.texixi.com:8911/ws");
+    var websocket = new WebSocket("ws://localhost:8911/ws");
 
     $(document).ready(function()
     {
@@ -102,7 +102,7 @@
             type: "POST",// 方法类型
             contentType: "application/json",
             dataType: "json",// 预期服务器返回的数据类型
-            url: "https://www.texixi.com:8080/v1/user/check_auth" ,// url
+            url: "http://localhost:8080/v1/user/check_auth" ,// url
             data:  JSON.stringify(jsonData) ,
             success: function (result) {
                 if (result.code == 0) {
@@ -173,7 +173,7 @@
         $.ajax({
             type: "POST",// 方法类型
             dataType: "json",// 预期服务器返回的数据类型
-            url: "https://www.texixi.com:6921/api/v1/getRoomInfo?rid=1" ,// url
+            url: "http://localhost:6921/api/v1/getRoomInfo?rid=1" ,// url
             success: function (result) {
                 if (result.code != 0) {
                     alert("请求出错，请稍后重试！")
@@ -194,14 +194,14 @@
             // 几个参数需要注意一下
             type: "POST",// 方法类型
             dataType: "json",// 预期服务器返回的数据类型
-            url: "https://www.texixi.com:6921/api/v1/pushRoom?auth="+getCookie("auth")+"&rid=1" ,// url
+            url: "http://localhost:6921/api/v1/pushRoom?auth="+getCookie("auth")+"&rid=1" ,// url
             data: JSON.stringify(jsonData),
             success: function (result) {
                 if (result.code == 0) {
 
                 }else  {
                     alert("请先简单注册登录")
-                    window.location.href="https://www.texixi.com:1999/register.html";
+                    window.location.href="http://localhost:1999/register.html";
                 }
             },
             error : function() {
@@ -212,7 +212,7 @@
 
     function getCookie(name)
     {
-	return localStorage.getItem(name);
+        return localStorage.getItem(name);
     }
 
     function logout() {
@@ -220,11 +220,11 @@
             // 几个参数需要注意一下
             type: "GET",// 方法类型
             dataType: "json",// 预期服务器返回的数据类型
-            url: "https://www.texixi.com:8080/v1/user/logout?auth="+getCookie("auth") ,// url
+            url: "http://localhost:8080/v1/user/logout?auth="+getCookie("auth") ,// url
             // data: JSON.stringify(jsonData),
             success: function (result) {
                 if (result.code == 0) {
-                    window.location.href="https://www.texixi.com:1999/login.html";
+                    window.location.href="http://localhost:1999/login.html";
                 }else  {
                     alert("请求出错，请稍后重试！")
 

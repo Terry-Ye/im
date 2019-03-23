@@ -31,16 +31,16 @@ func main() {
 
 	// http
 
-	// if err := InitHTTP(); err != nil {
-	// 	log.Panic(fmt.Errorf("InitHttp() fatal error : %s \n", err))
-	// }
+	if err := InitHTTP(); err != nil {
+		log.Panic(fmt.Errorf("InitHttp() fatal error : %s \n", err))
+	}
 
 	// https
 	/**
 	You need to configure certPath and keyPath in logic.toml.
 	*/
-	if err := InitHTTPS(); err != nil {
-		log.Panicf("Please check the certPath and keyPath of wss or other, error:  %s \n", err)
-	}
+	// if err := InitHTTPS(); err != nil {
+	// 	log.Panicf("Please check the certPath and keyPath of wss or other, error:  %s \n", err)
+	// }
 
 }

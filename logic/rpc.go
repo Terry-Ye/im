@@ -20,6 +20,7 @@ func InitRPC() (err error) {
 	var (
 		network, addr string
 	)
+	// 单台开多个端口的情况
 	for _, bind := range Conf.Base.RPCAddrs {
 		log.Infof("RPCAddrs :%v", bind)
 		if network, addr, err = inet.ParseNetwork(bind); err != nil {
@@ -28,6 +29,7 @@ func InitRPC() (err error) {
 
 		go createServer(network, addr)
 	}
+
 	return
 }
 
@@ -35,15 +37,14 @@ func createServer(network string, addr string) {
 
 	s := server.NewServer()
 	addRegistryPlugin(s)
-	s.RegisterName(define.RPC_LOGIC_SERVER_PATH, new(LogicRpc), "")
+	s.RegisterName(define.RPC_LOGIC_SERVER_PATH, new(LogicRpc), "serverId=1")
 	s.Serve(network, addr)
 
 }
 
 func addRegistryPlugin(s *server.Server) {
-
 	r := &serverplugin.ZooKeeperRegisterPlugin{
-		ServiceAddress:   "tcp@localhost:6923",
+		ServiceAddress:   "tcp@127.0.0.1:6923",
 		ZooKeeperServers: []string{"127.0.0.1:2181"},
 		BasePath:         "/im_logic_rpc_server",
 		Metrics:          metrics.NewRegistry(),

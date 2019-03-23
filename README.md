@@ -1,5 +1,5 @@
 ### 简介
-纯go实现的im即时通讯系统，各层可单独部署，之间通过rpc通讯，支持集群，学习于goim, 总分三层
+纯go实现的im即时通讯系统，各层可单独部署，之间通过rpc通讯，支持集群，学习于goim, 另使用于zookeeper,扩展性会大大增强, 总分三层
 1. comet（用户连接层），可以直接部署多个节点，每个节点保证serverId 唯一，在配置文件comet.toml
 2. logic（业务逻辑层），无状态，各层通过rpc通讯，容易扩展，支持http接口来接收消息
 3. job（任务推送层）通过redsi 订阅发布功能进行推送到comet层。
@@ -26,8 +26,14 @@ go get -u github.com/Terry-Ye/im
 mv $GOPATH/src/github.com/Terry-Ye/im $GOPATH/src/im
 cd $GOPATH/src/im
 go get ./...
+# 需要使用zookeeper服务
+go get -u -v -tags "zookeeper" github.com/smallnest/rpcx/...
+
+
 
 ```
+
+[安装zookeeper文档](https://www.texixi.com/2019/03/22/Terry-Ye-im-%E9%A1%B9%E7%9B%AE%E4%BD%BF%E7%94%A8zookeeper%E6%96%87%E6%A1%A3/)
 
 golang.org 包拉不下来的情况，例
 ```
@@ -46,23 +52,27 @@ mv net $GOPATH/src/golang.org/x/
 2. 部署im
 安装comet、logic、job模块
 ```
-cd $GOPATH/src/im/comet
-mv comet.toml.example comet.toml
-go install
-
+# 注意：第一次需要先启动logic ，因为要注册 服务端的zookeeper, 不然先启动comet会报错，第二次则不需要
 cd ../logic/
 mv logic.toml.example logic.toml
-go install
+go install -tags zookeeper   # 或 go run  -tags zookeeper *.go
+$GOPATH/bin/logic d $GOPATH/src/im/logic/
+# nohup $GOPATH/bin/logic d $GOPATH/src/im/logic/ 2>&1 > /data/log/im/logic.log &
+
+cd $GOPATH/src/im/comet
+mv comet.toml.example comet.toml
+go install -tags zookeeper  # 或 go run  -tags zookeeper *.go
+# 启动
+$GOBIN/comet d $GOPATH/src/im/comet/
+# nohup $GOPATH/bin/comet d $GOPATH/src/im/comet/ 2>&1 > /data/log/im/comet.log &
+
 
 cd ../job
 mv job.toml.example job.toml
-go install
+go install # 或 go run *.go
+$GOPATH/bin/job d $GOPATH/src/im/job/
+# nohup $GOPATH/bin/job d $GOPATH/src/im/job/ 2>&1 > /data/log/im/job.log &
 
-nohup $GOPATH/bin/logic -d $GOPATH/src/im/logic/ 2>&1 > /data/log/im/logic.log &
-
-nohup $GOPATH/bin/comet -d $GOPATH/src/im/comet/ 2>&1 > /data/log/im/comet.log &
-
-nohup $GOPATH/bin/job -d $GOPATH/src/im/job/ 2>&1 > /data/log/im/job.log &
 
 
 // demo页面执行
@@ -87,6 +97,5 @@ go run main.go
 * 配置文件：github.com/spf13/viper
 
 ### 后续计划
-1. 在线列表
-2. 监控
-3. 聊天机器人
+1. 监控
+2. 聊天机器人

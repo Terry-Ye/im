@@ -1,15 +1,15 @@
 package main
 
 import (
-	"sync"
 	"im/libs/define"
 	"im/libs/proto"
+	"sync"
 	"sync/atomic"
 )
 
 type BucketOptions struct {
-	ChannelSize int
-	RoomSize    int
+	ChannelSize   int
+	RoomSize      int
 	RoutineAmount uint64
 	RoutineSize   int
 }
@@ -18,10 +18,10 @@ type Bucket struct {
 	chs      map[string]*Channel // map sub key to a channel
 	boptions BucketOptions
 	// room
-	rooms map[int32]*Room // bucket room channels
+	rooms       map[int32]*Room // bucket room channels
 	routines    []chan *proto.RoomMsgArg
 	routinesNum uint64
-	broadcast chan []byte
+	broadcast   chan []byte
 }
 
 func NewBucket(boptions BucketOptions) (b *Bucket) {
@@ -31,7 +31,7 @@ func NewBucket(boptions BucketOptions) (b *Bucket) {
 	b.boptions = boptions
 	b.routines = make([]chan *proto.RoomMsgArg, boptions.RoutineAmount)
 	b.rooms = make(map[int32]*Room, boptions.RoomSize)
-	for i :=  uint64(0); i < b.boptions.RoutineAmount; i++ {
+	for i := uint64(0); i < b.boptions.RoutineAmount; i++ {
 		c := make(chan *proto.RoomMsgArg, boptions.RoutineSize)
 		b.routines[i] = c
 		go b.PushRoom(c)
@@ -39,8 +39,7 @@ func NewBucket(boptions BucketOptions) (b *Bucket) {
 	return
 }
 
-
-func (b *Bucket) Put(uid string, rid int32, ch *Channel) (err error){
+func (b *Bucket) Put(uid string, rid int32, ch *Channel) (err error) {
 	var (
 		room *Room
 		ok   bool
@@ -48,7 +47,7 @@ func (b *Bucket) Put(uid string, rid int32, ch *Channel) (err error){
 	b.cLock.Lock()
 
 	if rid != define.NO_ROOM {
-		if  room, ok = b.rooms[rid]; !ok {
+		if room, ok = b.rooms[rid]; !ok {
 			room = NewRoom(rid)
 			b.rooms[rid] = room
 		}
@@ -64,9 +63,7 @@ func (b *Bucket) Put(uid string, rid int32, ch *Channel) (err error){
 	return
 }
 
-
-
-func (b *Bucket) Channel(key string)  (ch *Channel){
+func (b *Bucket) Channel(key string) (ch *Channel) {
 	// 读操作的锁定和解锁
 	b.cLock.RLock()
 	ch = b.chs[key]
@@ -77,10 +74,11 @@ func (b *Bucket) Channel(key string)  (ch *Channel){
 func (b *Bucket) PushRoom(c chan *proto.RoomMsgArg) {
 	for {
 		var (
-			arg *proto.RoomMsgArg
+			arg  *proto.RoomMsgArg
 			room *Room
 		)
-		arg = <- c
+		arg = <-c
+
 		if room = b.Room(arg.RoomId); room != nil {
 			room.Push(&arg.P)
 		}
@@ -91,7 +89,7 @@ func (b *Bucket) PushRoom(c chan *proto.RoomMsgArg) {
 
 func (b *Bucket) delCh(ch *Channel) {
 	var (
-		ok bool
+		ok   bool
 		room *Room
 	)
 	b.cLock.RLock()
@@ -105,7 +103,6 @@ func (b *Bucket) delCh(ch *Channel) {
 		// if room empty delete
 		room.Del(ch)
 	}
-
 
 	b.cLock.RUnlock()
 
@@ -122,6 +119,7 @@ func (b *Bucket) Room(rid int32) (room *Room) {
 func (b *Bucket) BroadcastRoom(arg *proto.RoomMsgArg) {
 	// 广播消息递增id
 	num := atomic.AddUint64(&b.routinesNum, 1) % b.boptions.RoutineAmount
+	// log.Infof("BroadcastRoom RoomMsgArg :%s", arg)
 	// log.Infof("bucket routinesNum :%d", b.routinesNum)
 	b.routines[num] <- arg
 

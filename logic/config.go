@@ -1,9 +1,9 @@
 package main
 
 import (
-	"runtime"
 	"flag"
 	"github.com/spf13/viper"
+	"runtime"
 	// "github.com/go-redis/redis"
 	"fmt"
 	"time"
@@ -25,18 +25,18 @@ type Config struct {
 
 // 基础的配置信息
 type BaseConf struct {
-	Pidfile        string   `mapstructure:"pidfile"`
-	MaxProc        int
-	PprofAddrs     []string `mapstructure:"pprofBind"` //
-	HttpAddrs      []string `mapstructure:"httpAddr"`  //
-	RedisAddr      string   `mapstructure:"RedisAddr"` //
-	RedisPw        string   `mapstructure:"redisPw"`
-	RedisDefaultDB int      `mapstructure:"redisDefaultDB"`
-	RPCAddrs       []string `mapstructure:"RPCAddrs"` //
+	Pidfile          string `mapstructure:"pidfile"`
+	MaxProc          int
+	PprofAddrs       []string      `mapstructure:"pprofBind"` //
+	HttpAddrs        []string      `mapstructure:"httpAddr"`  //
+	RedisAddr        string        `mapstructure:"RedisAddr"` //
+	RedisPw          string        `mapstructure:"redisPw"`
+	RedisDefaultDB   int           `mapstructure:"redisDefaultDB"`
+	RPCAddrs         []string      `mapstructure:"RPCAddrs"` //
 	HTTPReadTimeout  time.Duration `mapstructure:"HTTPReadTimeout"`
 	HTTPWriteTimeout time.Duration `mapstructure:"HTTPWriteTimeout"`
-	CertPath       string  `mapstructure:"certPath"`
-	KeyPath        string  `mapstructure:"keyPath"`
+	CertPath         string        `mapstructure:"certPath"`
+	KeyPath          string        `mapstructure:"keyPath"`
 }
 
 func InitConfig() (err error) {
@@ -59,16 +59,16 @@ func InitConfig() (err error) {
 func NewConfig() *Config {
 	return &Config{
 		Base: BaseConf{
-			Pidfile:        "/tmp/logic.pid",
-			MaxProc:        runtime.NumCPU(),
-			PprofAddrs:     []string{"localhost:6922"},
-			HttpAddrs:      []string{"tcp@0.0.0.0:6921"},
-			RedisAddr:      "127.0.0.1:6379",
-			RedisPw:        "",
-			RedisDefaultDB: 0,
-			RPCAddrs:       []string{"tcp@localhost:6923"},
-			HTTPReadTimeout: 10  * time.Second,
-			HTTPWriteTimeout: 20  * time.Second,
+			Pidfile:          "/tmp/logic.pid",
+			MaxProc:          runtime.NumCPU(),
+			PprofAddrs:       []string{"localhost:6922"},
+			HttpAddrs:        []string{"tcp@0.0.0.0:6921"},
+			RedisAddr:        "127.0.0.1:6379",
+			RedisPw:          "",
+			RedisDefaultDB:   0,
+			RPCAddrs:         []string{"tcp@localhost:6923"},
+			HTTPReadTimeout:  10 * time.Second,
+			HTTPWriteTimeout: 20 * time.Second,
 		},
 	}
 }

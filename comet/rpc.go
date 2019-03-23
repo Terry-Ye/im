@@ -36,7 +36,7 @@ func createServer(network string, addr string) {
 
 	addRegistryPlugin(s)
 
-	s.RegisterName(define.RPC_PUSH_SERVER_PATH, new(PushRpc), "")
+	s.RegisterName(define.RPC_COMET_SERVER_PATH, new(PushRpc), "serverId=1")
 	log.Infof("createServer addr %s", addr)
 	s.Serve(network, addr)
 }
@@ -44,7 +44,7 @@ func createServer(network string, addr string) {
 func addRegistryPlugin(s *server.Server) {
 
 	r := &serverplugin.ZooKeeperRegisterPlugin{
-		ServiceAddress:   "tcp@0.0.0.0:6923",
+		ServiceAddress:   "tcp@0.0.0.0:6912",
 		ZooKeeperServers: []string{"127.0.0.1:2181"},
 		BasePath:         "/im_logic_rpc_server",
 		Metrics:          metrics.NewRegistry(),

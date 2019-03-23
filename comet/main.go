@@ -58,16 +58,16 @@ func main() {
 	/**
 	ws
 	*/
-	// if err := InitWebsocket(Conf.Websocket.Bind); err != nil {
-	//	log.Panicf("InitWebsocket() error:  %s \n", err)
-	// }
+	if err := InitWebsocket(Conf.Websocket.Bind); err != nil {
+		log.Panicf("InitWebsocket() error:  %s \n", err)
+	}
 
 	/**
 	wss
 	You need to configure certPath and keyPath in comet.toml.
 	*/
-	if err := InitWebsocketWss(Conf.Websocket.Bind); err != nil {
-		log.Panicf("Please check the certPath and keyPath of wss or other, error:  %s \n", err)
-	}
+	// if err := InitWebsocketWss(Conf.Websocket.Bind); err != nil {
+	// 	log.Panicf("Please check the certPath and keyPath of wss or other, error:  %s \n", err)
+	// }
 
 }

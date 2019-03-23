@@ -3,11 +3,11 @@ package main
 import (
 	"net/http"
 
+	"encoding/json"
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
-	"time"
 	"im/libs/proto"
-	"encoding/json"
+	"time"
 )
 
 var (
@@ -44,11 +44,9 @@ func InitWebsocketWss(bind string) (err error) {
 		serveWs(DefaultServer, w, r)
 	})
 
-
 	err = http.ListenAndServeTLS(bind, Conf.Base.CertPath, Conf.Base.KeyPath, nil)
 	return err
 }
-
 
 // serveWs handles websocket requests from the peer.
 func serveWs(server *Server, w http.ResponseWriter, r *http.Request) {
@@ -93,7 +91,7 @@ func (s *Server) readPump(ch *Channel) {
 	ch.conn.SetReadLimit(s.Options.MaxMessageSize)
 	ch.conn.SetReadDeadline(time.Now().Add(s.Options.PongWait))
 	ch.conn.SetPongHandler(func(string) error {
-		ch.conn.SetReadDeadline(time.Now().Add(s.Options.PongWait));
+		ch.conn.SetReadDeadline(time.Now().Add(s.Options.PongWait))
 		return nil
 	})
 
@@ -159,14 +157,14 @@ func (s *Server) writePump(ch *Channel) {
 			ch.conn.SetWriteDeadline(time.Now().Add(s.Options.WriteWait))
 			if !ok {
 				// The hub closed the channel.
-				log.Warn("SetWriteDeadline not ok " )
+				log.Warn("SetWriteDeadline not ok ")
 				ch.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 
 			w, err := ch.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
-				log.Warn(" ch.conn.NextWriter err :%s  ", err )
+				log.Warn(" ch.conn.NextWriter err :%s  ", err)
 				return
 			}
 			log.Infof("message write body:%s", message.Body)
