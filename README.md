@@ -2,7 +2,7 @@
 纯go实现的im即时通讯系统，各层可单独部署，之间通过rpc通讯，支持集群，学习于goim, 另使用于zookeeper,扩展性会大大增强, 总分三层
 1. comet（用户连接层），可以直接部署多个节点，每个节点保证serverId 唯一，在配置文件comet.toml
 2. logic（业务逻辑层），无状态，各层通过rpc通讯，容易扩展，支持http接口来接收消息
-3. job（任务推送层）通过redsi 订阅发布功能进行推送到comet层。
+3. job（任务推送层）通过redis 订阅发布功能进行推送到comet层。
 
 ### 架构图
 ![image](https://note.youdao.com/yws/public/resource/ac2abf3027ec5c46d62bb5d690d2ed18/xmlnote/WEBRESOURCEabe5f0a5c9699a8c878afac92f4dc6bb/3749)
@@ -61,7 +61,7 @@ cd $GOPATH/src/im/comet
 mv comet.toml.example comet.toml
 go install -tags zookeeper  # 或 go run  -tags zookeeper *.go
 # 启动
-$GOBIN/comet d $GOPATH/src/im/comet/
+$GOPATH/bin/comet d $GOPATH/src/im/comet/
 # nohup $GOPATH/bin/comet d $GOPATH/src/im/comet/ 2>&1 > /data/log/im/comet.log &
 
 

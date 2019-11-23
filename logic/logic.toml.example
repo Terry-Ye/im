@@ -14,5 +14,6 @@ redisPw = ""
 [zookeeper]
 host = "127.0.0.1:2181"
 basePath = "/im_logic_rpc_server"
+serverPathLogic = "LogicRpc"
 ServerId = "1"
 

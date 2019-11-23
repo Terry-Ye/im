@@ -12,3 +12,11 @@ pushChanSize = 50
 key = 1
 addr = "tcp@0.0.0.0:6912"
 
+
+[zookeeper]
+host = "127.0.0.1:2181"
+basePath = "/im_logic_rpc_server"
+serverPathLogic = "LogicRpc"
+serverPathComet = "CometRpc"
+ServerId = "1"
+
